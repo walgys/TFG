@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "firebase": "^9.8.2",
+    "dotenv": "^16.0.1",
+    "firebase-admin": "^10.2.0",
     "nodemon": "^2.0.16",
     "websocket": "^1.0.34"
   }
