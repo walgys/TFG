@@ -8,4 +8,10 @@ const servicios = {
   servicioColasAtencion: ServicioColasAtencion,
 };
 
-module.exports = { servicios };
+const plataformas = {
+  MESSENGER: 'MESSENGER',
+  TELEGRAM: 'TELEGRAM',
+  WEBCHAT: 'WEBCHAT',
+};
+
+module.exports = { servicios, plataformas };

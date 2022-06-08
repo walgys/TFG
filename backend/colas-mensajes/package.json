@@ -1,19 +1,16 @@
 {
-  "name": "orquestador",
+  "name": "colas-mensajes",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "service.js",
   "scripts": {
-    "start": "node ./main.js"
+    "start": "node ./service.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.27.2",
-    "firebase-admin": "^10.2.0",
-    "socket.io": "^4.5.1",
-    "socket.io-client": "^4.5.1"
+    "socket.io": "^4.5.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.16"

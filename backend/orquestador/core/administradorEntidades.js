@@ -5,7 +5,15 @@ class AdministradorEntidades {
     this.datosInternos = ManejadorDatosInternos.getInstance();
   }
 
-  crearAgente = () => {};
+  obtenerAgente = (idAgente) => {};
+
+  obtenerCanalComunicacion = (idCanalComunicacion) => {};
+
+  obtenerNegocio = (idNegocio) => {};
+
+  obtenerIntencion = (idIntencion) => {};
+
+  obtenerCliente = (idCliente) => {};
 }
 
 exports.AdministradorEntidades;
