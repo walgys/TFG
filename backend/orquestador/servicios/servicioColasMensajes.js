@@ -8,17 +8,7 @@ class ServicioColasMensajes {
     this.socket = ioClient(this.serverAddr, {
       path: '/',
     });
-    this.socket.on('connect', (data) => {
-      console.log(`connected to ${this.serverAddr}`);
-
-      this.socket.on('recibirMensaje', (data) => {
-        console.log(`event: recibirMensaje, ${data}`);
-      });
-
-      this.socket.on('heartbeat', () => {
-        console.log('heartbeat');
-      });
-    });
+    this.socket.on('connect', this.procesarMensajeWebsocket);
   }
 
   static getInstancia() {
@@ -28,8 +18,29 @@ class ServicioColasMensajes {
     return this._instancia;
   }
 
+  procesarMensajeWebsocket = (client) => {
+    console.log('someone connected');
+
+    this.socket.on('respuestaAgregarMensaje', (mensaje) => {
+      console.log(`event: respuestaAgregarMensaje, data: ${mensaje}`);
+    });
+
+    this.socket.on('respuestaObtenerMensaje', (mensaje) => {
+      console.log(`event: respuestaObtenerMensaje, mensaje: ${mensaje}`);
+    });
+
+    this.socket.on('heartbeat', () => {
+      console.log('heartbeat');
+      client.emit('heartbeat', '');
+    });
+
+    this.socket.on('disconnect', () => {
+      console.log('client disconnected');
+    });
+  };
+
   agregarMensaje = (mensaje) => {
-    this.socket.emit('agregarMensaje', mensaje);
+    this.socket.emit('agregarMensaje', JSON.stringify(mensaje));
   };
 
   obtenerMensaje = () => {

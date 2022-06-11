@@ -1,24 +1,46 @@
-import logo from './logo.svg';
 import './App.css';
+import EncabezadoChat from './components/EncabezadoChat';
+import CuerpoChat from './components/CuerpoChat';
+import PieChat from './components/PieChat';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { CancelOutlined, Minimize } from '@mui/icons-material';
+import { Fab, Grow, makeStyles } from '@mui/material';
+import { useState } from 'react';
 
 function App() {
+  const [maximizado, setMaximizado] = useState(false);
+  const minMax = () => {
+    setMaximizado(!maximizado);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Grow
+        in={maximizado}
+        style={{ transformOrigin: 'bottom' }}
+        {...(maximizado ? { timeout: 1500 } : { timeout: 1000 })}
+      >
+        <div className="webchat">
+          <EncabezadoChat />
+          <CuerpoChat />
+          <PieChat />
+        </div>
+      </Grow>
+      <Fab
+        sx={{
+          position: 'absolute',
+          bottom: maximizado ? 5 : 0,
+          right: maximizado ? 5 : 0,
+          marginRight: '25px',
+          marginBottom: '15px',
+        }}
+        size={maximizado ? 'medium' : 'large'}
+        color={maximizado ? 'error' : 'primary'}
+        aria-label="add"
+        onClick={minMax}
+      >
+        {maximizado ? <CancelOutlined /> : <ChatBubbleOutlineIcon />}
+      </Fab>
+    </>
   );
 }
 

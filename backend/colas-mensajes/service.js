@@ -1,14 +1,29 @@
 const server = require('http').createServer();
+const { Cola } = require('./cola');
 const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+  },
   path: '/',
 });
+const cola = new Cola();
 
 io.on('connection', (client) => {
   console.log('someone connected');
 
-  client.on('agregarMensaje', (data) => {
-    console.log(`event: agregarMensaje, data: ${data}`);
-    client.emit('recibirMensaje', 'Hello from http://localhost:4000');
+  client.on('agregarMensaje', (mensaje) => {
+    console.log(`event: agregarMensaje, data: ${mensaje}`);
+    cola.ponerEnCola(JSON.parse(mensaje));
+    client.emit('respuestaAgregarMensaje', mensaje);
+  });
+
+  client.on('obtenerMensaje', () => {
+    const mensaje = cola.sacarDeCola();
+    if (mensaje ?? null) {
+      client.emit('respuestaObtenerMensaje', JSON.stringify(mensaje));
+    } else {
+      client.emit('respuestaObtenerMensaje', '{}');
+    }
   });
 
   client.on('heartbeat', () => {

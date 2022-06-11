@@ -14,9 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { asignarUsuario } from './redux/reducers/rebanadaUsuario';
 import { useCookies } from 'react-cookie';
 import Navegacion from './componentes/Navegacion';
-import {Container} from '@mui/material';
-
-let AuthContext = React.createContext();
+import { Container } from '@mui/material';
+import { AuthContext, AppContext } from './utilitarios/contextos';
+import { administradorConexion } from './utilitarios/utilitarios';
 
 function useAuth(AuthContext) {
   return React.useContext(AuthContext);
@@ -70,6 +70,7 @@ function App() {
     'botaidToken',
     'emailUsuario',
   ]);
+
   const dispatch = useDispatch();
   if (cookies.botaidToken && cookies.emailUsuario)
     dispatch(
@@ -80,28 +81,27 @@ function App() {
     );
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
-      <Container>
-      <Navegacion />
-        <Routes>
-          <Route path="/" element={<Navigate to="/Intenciones" />} />
-          <Route
-            path="/Ingreso"
-            element={<Ingreso useAuth={useAuth} authContext={AuthContext} />}
-          />
-          <Route
-            path="/Intenciones"
-            element={
-              <RequireAuth>
-                <Intenciones authContext={AuthContext} />
-              </RequireAuth>
-            }
-          />
-        </Routes>
-        </Container>
-      </BrowserRouter>
-    </AuthProvider>
+    <AppContext.Provider value={{ administradorConexion }}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Container>
+            <Navegacion />
+            <Routes>
+              <Route path="/" element={<Navigate to="/Intenciones" />} />
+              <Route path="/Ingreso" element={<Ingreso useAuth={useAuth} />} />
+              <Route
+                path="/Intenciones"
+                element={
+                  <RequireAuth>
+                    <Intenciones authContext={AuthContext} />
+                  </RequireAuth>
+                }
+              />
+            </Routes>
+          </Container>
+        </BrowserRouter>
+      </AuthProvider>
+    </AppContext.Provider>
   );
 }
 

@@ -12,10 +12,18 @@ import {
   ListItemButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { AppContext } from '../utilitarios/contextos';
 
 const Intenciones = (props) => {
   const usuario = useSelector((state) => state.usuario);
   console.log(usuario);
+  const context = useContext(AppContext);
+  const { administradorConexion } = context;
+
+  const enviarMensajeHandler = () => {
+    console.log('aprete');
+    administradorConexion.enviarMensaje({ id: '1234', texto: 'Hola mundo!' });
+  };
   return (
     <Paper>
       <div style={{ display: 'flex', minHeight: '90vh' }}>
@@ -59,7 +67,7 @@ const Intenciones = (props) => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <List>
-                      <ListItemButton>
+                      <ListItemButton onClick={enviarMensajeHandler}>
                         <Typography>Pregunta ecommerce inicial</Typography>
                       </ListItemButton>
                     </List>

@@ -11,5 +11,7 @@ class Cola {
   ponerEnCola = (mensaje) => {
     this._cola.push(mensaje);
   };
-  sacarDeCola = () => this._cola.pop();
+  sacarDeCola = () => this._cola.shift();
 }
+
+module.exports = { Cola };
