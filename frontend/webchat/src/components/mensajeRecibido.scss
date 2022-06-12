@@ -1,0 +1,18 @@
+.contenedor-mensaje-recibido {
+    background: #F2F2F7;
+    display: flex;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 0px 6px 3px 6px;
+    min-width: 180px;
+}
+
+.arrow-left-recibido {
+    display: flex;
+    width: 0;
+    height: 0;
+    border-top-left-radius: 4px;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #F2F2F7;
+}

@@ -1,22 +1,6 @@
 .cuerpo-chat {
-    height: 500px;
+    height: calc(60vh);
+    max-height: 500px;
     padding: 10px 0px 10px 0px;
-}
-
-.contenedor-mensaje {
-    background: #304FFE;
-    display: flex;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    border-top-right-radius: 8px;
-    padding: 6px;
-}
-
-.arrow-left {
-    display: flex;
-    width: 0;
-    height: 0;
-    border-top-left-radius: 4px;
-    border-bottom: 10px solid transparent;
-    border-right: 10px solid #304FFE;
+    overflow: hidden;
 }

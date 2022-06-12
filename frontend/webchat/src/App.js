@@ -13,13 +13,13 @@ function App() {
     setMaximizado(!maximizado);
   };
   return (
-    <>
+    <div style={{ position: 'absolute', bottom: '0', right: '0' }}>
       <Grow
         in={maximizado}
         style={{ transformOrigin: 'bottom' }}
         {...(maximizado ? { timeout: 1500 } : { timeout: 1000 })}
       >
-        <div className="webchat">
+        <div className={maximizado ? 'webchat' : 'webchat minimizado'}>
           <EncabezadoChat />
           <CuerpoChat />
           <PieChat />
@@ -40,7 +40,7 @@ function App() {
       >
         {maximizado ? <CancelOutlined /> : <ChatBubbleOutlineIcon />}
       </Fab>
-    </>
+    </div>
   );
 }
 
