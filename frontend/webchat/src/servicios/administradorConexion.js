@@ -4,7 +4,7 @@ class AdministradorConexion {
   _instancia;
 
   constructor() {
-    this.serverAddr = 'http://localhost:8000';
+    this.serverAddr = 'http://localhost:9000';
     this.socket = ioClient.connect(this.serverAddr);
     this.socket.on('connect', this.procesarMensajeWebsocket);
   }
@@ -19,8 +19,12 @@ class AdministradorConexion {
   procesarMensajeWebsocket = (client) => {
     console.log(`connected to ${this.serverAddr}`);
 
-    this.socket.on('recibiMensajeConsolaEntrante', (data) => {
-      console.log(`event: recibiMensajeConsolaEntrante, ${data}`);
+    this.socket.on('recibiMensajeEntrante-webchat', (data) => {
+      console.log(data);
+    });
+
+    this.socket.on('respuestabuscarHistorialConversacion-webchat', (data) => {
+      console.log(data);
     });
 
     this.socket.on('heartbeat', () => {
@@ -29,17 +33,27 @@ class AdministradorConexion {
   };
 
   enviarMensaje = (mensaje) => {
-    console.log('me apretaste');
-    this.socket.emit('mensajeConsolaEntrante', JSON.stringify(mensaje));
+    this.socket.emit('webchat-mensajeEntrante', JSON.stringify(mensaje));
   };
 
   obtenerMensaje = () => {
-    this.socket.emit('obtenerMensaje', '');
+    this.socket.emit('webchat-obtenerMensaje', '');
   };
 
   heartbeat = () => {
     console.log('emait');
     this.socket.emit('heartbeat', '');
+  };
+
+  obtenerCliente = () => {
+    this.socket.emit('webchat-nuevoCliente');
+  };
+
+  buscarHistorialConversacion = (data) => {
+    this.socket.emit(
+      'webchat-buscarHistorialConversacion',
+      JSON.stringify(data)
+    );
   };
 }
 

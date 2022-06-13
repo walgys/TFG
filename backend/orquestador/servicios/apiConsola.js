@@ -1,5 +1,5 @@
-const { ManejadorDatosInternos } = require('./manejadorDatosInterno');
 const io = require('socket.io');
+const { ManejadorDatosInternos } = require('./manejadorDatosInternos');
 class ApiConsola {
   _instancia;
 

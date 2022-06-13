@@ -1,8 +1,8 @@
-const { plataformas } = require('../utilitarios/configuracion');
+const { PLATAFORMAS } = require('../utilitarios/configuracion');
 
 class Webchat {
   constructor() {
-    this.plataforma = plataformas.WEBCHAT;
+    this.plataforma = PLATAFORMAS.WEBCHAT;
   }
 
   enviarMensaje = (mensaje) => {};

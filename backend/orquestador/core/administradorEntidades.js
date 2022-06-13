@@ -1,8 +1,14 @@
-import ManejadorDatosInternos from '../servicios/manejadorDatosInterno';
-
 class AdministradorEntidades {
+  _instancia;
   constructor() {
-    this.datosInternos = ManejadorDatosInternos.getInstance();
+    this.datosInternos;
+  }
+
+  static getInstancia() {
+    if (!this._instancia) {
+      this._instancia = new AdministradorEntidades();
+    }
+    return this._instancia;
   }
 
   obtenerAgente = (idAgente) => {};
@@ -16,4 +22,4 @@ class AdministradorEntidades {
   obtenerCliente = (idCliente) => {};
 }
 
-exports.AdministradorEntidades;
+module.exports = { AdministradorEntidades };

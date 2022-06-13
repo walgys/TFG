@@ -1,8 +1,8 @@
-const { plataformas } = require('../utilitarios/configuracion');
+const { PLATAFORMAS } = require('../utilitarios/configuracion');
 
 class Telegram {
   constructor() {
-    this.plataforma = plataformas.TELEGRAM;
+    this.plataforma = PLATAFORMAS.TELEGRAM;
   }
 
   enviarMensaje = (mensaje) => {};

@@ -1,8 +1,8 @@
-const { plataformas } = require('../utilitarios/configuracion');
+const { PLATAFORMAS } = require('../utilitarios/configuracion');
 
 class Messenger {
   constructor() {
-    this.plataforma = plataformas.MESSENGER;
+    this.plataforma = PLATAFORMAS.MESSENGER;
   }
 
   enviarMensaje = (mensaje) => {};

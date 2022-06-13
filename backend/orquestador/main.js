@@ -1,12 +1,8 @@
-const { ApiConsola } = require('./servicios/apiConsola');
-const { ManejadorDatosInternos } = require('./servicios/manejadorDatosInterno');
-const { ServicioColasMensajes } = require('./servicios/servicioColasMensajes');
-const { ServicioPLN } = require('./servicios/servicioPLN');
+const { ManejadorServicios } = require('./servicios/manejadorServicios');
 
 const main = async () => {
-  const apiConsola = new ApiConsola();
-  const servicioColasMensajes = new ServicioColasMensajes();
-  setInterval(() => servicioColasMensajes.obtenerMensaje(), 1000);
+  const manejadorServicios = ManejadorServicios.getInstancia();
+  const manejadorWebchat = manejadorServicios.servicios.manejadorWebchat;
   /*let id = 1;
   setInterval(() => servicioColasMensajes.obtenerMensaje(), 1000);
   setInterval(() => {

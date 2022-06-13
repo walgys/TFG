@@ -3,7 +3,7 @@ class ServicioColasAtencion {
   constructor() {}
   static getInstancia() {
     if (!this._instancia) {
-      this._instancia = new ManejadorDatosInternos();
+      this._instancia = new ServicioColasAtencion();
     }
     return this._instancia;
   }

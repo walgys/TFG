@@ -2,6 +2,7 @@ const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 const path = require('path');
+
 class ManejadorDatosInternos {
   constructor() {
     this.firebaseApp = initializeApp({
@@ -77,7 +78,16 @@ class ManejadorDatosInternos {
 
   eliminarCanal = () => {};
 
-  buscarHistorialConversacion = () => {};
+  buscarHistorialConversacion = async (idCliente) => {
+    const result = await this.firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .collection('sesiones')
+      .get();
+    let sesiones = [];
+    result.docs.forEach((sesion) => sesiones.push(sesion.data()));
+    return sesiones;
+  };
 
   verificarToken = async (token) => admin.auth().verifyIdToken(token);
 }

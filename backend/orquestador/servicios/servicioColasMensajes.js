@@ -13,7 +13,7 @@ class ServicioColasMensajes {
 
   static getInstancia() {
     if (!this._instancia) {
-      this._instancia = new ManejadorDatosInternos();
+      this._instancia = new ServicioColasMensajes();
     }
     return this._instancia;
   }

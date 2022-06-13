@@ -1,17 +1,16 @@
-const { ServicioColasAtencion } = require('./servicioColasAtencion');
-const { ServicioColasMensajes } = require('./servicioColasMensajes');
-const { ServicioPLN } = require('./servicioPLN');
-
-const servicios = {
-  servicioPLN: ServicioPLN,
-  servicioColasMensajes: ServicioColasMensajes,
-  servicioColasAtencion: ServicioColasAtencion,
+const SERVICIOS = {
+  servicioPLN: 'servicioPLN',
+  servicioColasMensajes: 'servicioColasMensajes',
+  servicioColasAtencion: 'servicioColasAtencion',
+  manejadorWebchat: 'manejadorWebchat',
+  apiConsola: 'apiConsola',
+  manejadorDatosInternos: 'manejadorDatosInternos',
+  manejadorDatosExternos: 'manejadorDatosExternos',
 };
 
-const plataformas = {
+const PLATAFORMAS = {
   MESSENGER: 'MESSENGER',
   TELEGRAM: 'TELEGRAM',
   WEBCHAT: 'WEBCHAT',
 };
-
-module.exports = { servicios, plataformas };
+module.exports = { SERVICIOS, PLATAFORMAS };

@@ -31,12 +31,11 @@ const MensajeEnviado = (props) => {
               wordWrap: 'break-word',
               margin: 0,
             }}
-            primary={
+          >
+            <div>
               <Typography align="left" sx={{ color: 'white', fontSize: '9pt' }}>
                 {texto}
               </Typography>
-            }
-            secondary={
               <div
                 style={{
                   display: 'flex',
@@ -68,8 +67,8 @@ const MensajeEnviado = (props) => {
                   </Typography>
                 </div>
               </div>
-            }
-          />
+            </div>
+          </ListItemText>
         </div>
         <div className="arrow-right-enviado"></div>
       </div>
