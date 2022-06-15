@@ -9,7 +9,7 @@ const { ServicioColasMensajes } = require('./servicioColasMensajes');
 const { ServicioPLN } = require('./servicioPLN');
 
 class ManejadorServicios {
-  _instancia;
+  static #instancia;
   constructor() {
     const manejadorDatosInternos = ManejadorDatosInternos.getInstancia();
     const manejadorDatosExternos = ManejadorDatosExternos.getInstancia();
@@ -32,16 +32,19 @@ class ManejadorServicios {
     this.configurarServicios();
   }
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new ManejadorServicios();
+    if (!this.#instancia) {
+      this.#instancia = new ManejadorServicios();
     }
-    return this._instancia;
+    return this.#instancia;
   }
 
   configurarServicios = () => {
     this.servicios.manejadorWebchat.configurar(
       this.servicios.manejadorDatosInternos,
       this.servicios.administradorEntidades
+    );
+    this.servicios.administradorEntidades.configurar(
+      this.servicios.manejadorDatosInternos
     );
   };
 }

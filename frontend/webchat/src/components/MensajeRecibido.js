@@ -9,7 +9,7 @@ import './mensajeRecibido.scss';
 import React from 'react';
 
 const MensajeRecibido = (props) => {
-  const { negocio, texto, hora, ultimo = false } = props;
+  const { nombreAvatar, texto, hora, ultimo = false } = props;
   return (
     <ListItem sx={{ alignItems: 'flex-start' }}>
       <ListItemAvatar sx={{ minWidth: '25px' }}>
@@ -41,7 +41,7 @@ const MensajeRecibido = (props) => {
                     fontWeight: '600',
                   }}
                 >
-                  {negocio}
+                  {nombreAvatar}
                 </Typography>
                 <Typography
                   align="left"

@@ -1,14 +1,14 @@
 const { axios } = require('axios');
 
 class ManejadorDatosExternos {
-  _instancia;
+  static #instancia;
   constructor() {}
 
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new ManejadorDatosExternos();
+    if (!this.#instancia) {
+      this.#instancia = new ManejadorDatosExternos();
     }
-    return this._instancia;
+    return this.#instancia;
   }
 
   buscarListaProductos = () => {};

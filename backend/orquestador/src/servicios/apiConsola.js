@@ -1,7 +1,7 @@
 const io = require('socket.io');
 const { ManejadorDatosInternos } = require('./manejadorDatosInternos');
 class ApiConsola {
-  _instancia;
+  static #instancia;
 
   constructor() {
     this.datosInternos = ManejadorDatosInternos.getInstancia();
@@ -15,10 +15,10 @@ class ApiConsola {
   }
 
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new ApiConsola();
+    if (!this.#instancia) {
+      this.#instancia = new ApiConsola();
     }
-    return this._instancia;
+    return this.#instancia;
   }
 
   procesarMensajeWebsocket = (client) => {

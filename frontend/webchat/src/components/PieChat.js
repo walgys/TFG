@@ -5,11 +5,10 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SendIcon from '@mui/icons-material/Send';
 import React, { useContext, useState } from 'react';
 import './pieChat.scss';
-import { AppContext } from '../utilitarios/contextos';
 
-const PieChat = () => {
+const PieChat = (props) => {
   const [textoEnviar, setTextoEnviar] = useState('');
-  const { estado, setEstado, administradorConexion } = useContext(AppContext);
+  const { estado, setEstado, administradorConexion } = props
   const { sesiones } = estado;
 
   const enviarMensaje = () => {

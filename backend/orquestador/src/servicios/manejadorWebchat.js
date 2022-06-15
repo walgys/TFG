@@ -1,6 +1,6 @@
 const io = require('socket.io');
 class ManejadorWebchat {
-  _instancia;
+  static #instancia;
   datosInternos;
   administradorEntidades;
   constructor() {
@@ -12,14 +12,14 @@ class ManejadorWebchat {
       },
     });
 
-    this.websocket.on('connection', this.procesarMensajeWebsocket);
+    this.websocket.on('connection', this.#procesarMensajeWebsocket);
   }
 
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new ManejadorWebchat();
+    if (!this.#instancia) {
+      this.#instancia = new ManejadorWebchat();
     }
-    return this._instancia;
+    return this.#instancia;
   }
 
   configurar = (manejadorDatosInternos, administradorEntidades) => {
@@ -27,7 +27,7 @@ class ManejadorWebchat {
     this.administradorEntidades = administradorEntidades;
   };
 
-  procesarMensajeWebsocket = (client) => {
+  #procesarMensajeWebsocket = (client) => {
     console.log('someone connected');
 
     client.on('webchat-mensajeEntrante', (data) => {
@@ -49,7 +49,7 @@ class ManejadorWebchat {
       );
       client.emit(
         'respuestabuscarHistorialConversacion-webchat',
-        `{idCliente: ${idCliente}, sesiones: ${JSON.stringify(sesiones)}}`
+        JSON.stringify({ idCliente: idCliente, sesiones: sesiones })
       );
     });
 

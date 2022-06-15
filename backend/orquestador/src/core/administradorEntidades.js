@@ -1,15 +1,17 @@
 class AdministradorEntidades {
-  _instancia;
-  constructor() {
-    this.datosInternos;
-  }
+  static #instancia;
+  #datosInternos;
 
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new AdministradorEntidades();
+    if (!this.#instancia) {
+      this.#instancia = new AdministradorEntidades();
     }
-    return this._instancia;
+    return this.#instancia;
   }
+
+  configurar = (datosInternos) => {
+    this.#datosInternos = datosInternos;
+  };
 
   obtenerAgente = (idAgente) => {};
 

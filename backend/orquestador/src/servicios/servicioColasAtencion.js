@@ -1,11 +1,11 @@
 class ServicioColasAtencion {
-  _instancia;
+  static #instancia;
   constructor() {}
   static getInstancia() {
-    if (!this._instancia) {
-      this._instancia = new ServicioColasAtencion();
+    if (!this.#instancia) {
+      this.#instancia = new ServicioColasAtencion();
     }
-    return this._instancia;
+    return this.#instancia;
   }
 }
 
