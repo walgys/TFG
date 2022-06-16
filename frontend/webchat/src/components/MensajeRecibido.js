@@ -51,7 +51,7 @@ const MensajeRecibido = (props) => {
                     fontSize: '9pt',
                   }}
                 >
-                  {texto}
+                  {texto.replaceAll('\\n', '\n')}
                 </Typography>
               </div>
             }

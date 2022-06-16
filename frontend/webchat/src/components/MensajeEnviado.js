@@ -33,8 +33,11 @@ const MensajeEnviado = (props) => {
             }}
           >
             <div>
-              <Typography align="left" sx={{ color: 'white', fontSize: '9pt' }}>
-                {texto}
+              <Typography
+                align="left"
+                sx={{ color: 'white', fontSize: '9pt', whiteSpace: 'pre-line' }}
+              >
+                {texto.replaceAll('\\n', '\n')}
               </Typography>
               <div
                 style={{

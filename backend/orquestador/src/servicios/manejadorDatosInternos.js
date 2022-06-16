@@ -112,14 +112,14 @@ class ManejadorDatosInternos {
           return {
             id: mensaje.id,
             ...datosMensaje,
-            fecha: moment(datosMensaje.fecha),
+            fecha: datosMensaje.fecha,
           };
         });
         const sesionData = { ...sesion.data() };
         return {
           id: sesion.id,
           ...sesionData,
-          fecha: moment(sesionData.fecha),
+          fecha: sesionData.fecha,
           mensajes: mensajes,
         };
       })
