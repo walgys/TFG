@@ -1,5 +1,8 @@
 const { AdministradorEntidades } = require('../core/administradorEntidades');
 const { OrquestadorMensajes } = require('../core/orquestadorMensajes');
+const {
+  ProcesadorMensajesEntrantes,
+} = require('../core/procesadorMensajesEntrantes');
 const { ApiConsola } = require('./apiConsola');
 const { ManejadorDatosExternos } = require('./manejadorDatosExternos');
 const { ManejadorDatosInternos } = require('./manejadorDatosInternos');
@@ -17,7 +20,9 @@ class ManejadorServicios {
     const servicioPLN = ServicioPLN.getInstancia();
     const servicioColasMensajes = ServicioColasMensajes.getInstancia();
     const servicioColasAtencion = ServicioColasAtencion.getInstancia();
-    const manejadorWebchat = ManejadorWebchat.getInstancia();
+    //const manejadorWebchat = ManejadorWebchat.getInstancia();
+    const procesadorMensajesEntrantes =
+      ProcesadorMensajesEntrantes.getInstancia();
     const apiConsola = ApiConsola.getInstancia();
     const administradorEntidades = AdministradorEntidades.getInstancia();
     const verificadorTokens = VerificadorTokens.getInstancia();
@@ -29,8 +34,8 @@ class ManejadorServicios {
       servicioPLN,
       servicioColasMensajes,
       servicioColasAtencion,
-      manejadorWebchat,
       apiConsola,
+      procesadorMensajesEntrantes,
       administradorEntidades,
       verificadorTokens,
       orquestadorMensajes,
@@ -56,19 +61,26 @@ class ManejadorServicios {
       this.servicios.verificadorTokens
     );
 
-    await this.servicios.orquestadorMensajes.configurar(
+    /*await this.servicios.orquestadorMensajes.configurar(
       this.servicios.servicioColasMensajes,
       this.servicios.administradorEntidades,
       this.servicios.manejadorDatosExternos,
       this.servicios.manejadorDatosInternos,
-      this.servicios.servicioPLN
+      this.servicios.servicioPLN,
+      'orquestadorManejadorDialogos'
+    );*/
+
+    await this.servicios.procesadorMensajesEntrantes.configurar(
+      this.servicios.servicioColasMensajes,
+      'mensajeEntrante'
     );
-    await this.servicios.manejadorWebchat.configurar(
-      this.servicios.manejadorDatosInternos,
-      this.servicios.administradorEntidades,
-      this.servicios.verificadorTokens,
-      this.servicios.orquestadorMensajes
-    );
+    /*await this.servicios.manejadorWebchat.configurar({
+      manejadorDatosInternos: this.servicios.manejadorDatosInternos,
+      administradorEntidades: this.servicios.administradorEntidades,
+      verificadorTokens: this.servicios.verificadorTokens,
+      orquestadorMensajes: this.servicios.orquestadorMensajes,
+    });
+    */
   };
 }
 

@@ -29,19 +29,21 @@ class ManejadorDialogos {
   }
 
   #procesarMensaje = async () => {
-    const { idNegocio, texto } = this.#mensaje;
-    const datosCliente = this.#manejadorDatosInternos; //continuar aca
+    const { idCliente, texto } = this.#mensaje;
+    const datosCliente = this.#manejadorDatosInternos.buscarCliente(idCliente);
+    const { topico } = datosCliente.estado;
     const data = {
       idNegocio: 'MiTienda',
       contexto: {
-        topico: 'inicio',
+        topico: topico,
       },
       clienteDice: texto,
     };
-    this.#servicioPLN.buscarSimilitud();
-    console.log(this.#mensaje);
+    const intencionesSimilares = this.#servicioPLN.buscarSimilitud(data);
+    const mejorIntencion = intencionesSimilares?.similarities?.shift();
+    console.log(mejorIntencion);
 
-    this.#terminar({ uuid: this.#uuid, resultado: texto });
+    this.#terminar({ uuid: this.#uuid, resultado: mejorIntencion });
   };
 }
 

@@ -8,6 +8,8 @@ import { Fab, Grow, makeStyles } from '@mui/material';
 import { useEffect, useState, useCallback } from 'react';
 import moment from 'moment';
 import { useCookies } from 'react-cookie';
+import { v4 as uuid } from 'uuid';
+import AdministradorConexion from './servicios/administradorConexion';
 
 function App(props) {
   const [estado, setEstado] = useState({
@@ -19,7 +21,7 @@ function App(props) {
     forzarActualizarHistoral: false,
   });
   const [maximizado, setMaximizado] = useState(false);
-  const { administradorConexion } = props;
+  const administradorConexion = AdministradorConexion.getInstancia();
   const [cookies, setCookie, removeCookie] = useCookies(['botaidWebchatToken']);
 
   const minMax = () => {
@@ -43,10 +45,11 @@ function App(props) {
 
   useEffect(() => {
     if (
-      estado.idCliente != '' ||
       (estado.idCliente != '' && estado.forzarActualizarHistoral)
     ) {
       administradorConexion.buscarHistorialConversacion({
+        idSocket: estado.idSocket,
+        id: uuid(),
         idCliente: estado.idCliente,
         token: estado.token,
       });
@@ -71,8 +74,14 @@ function App(props) {
   }, []);
 
   useEffect(() => {
-    if (estado.idCanal !== '' && estado.idNegocio !== '')
+    console.log(estado);
+  }, [estado]);
+
+  useEffect(() => {
+    if (estado.idCanal !== '' && estado.idNegocio !== '' && estado.idSocket)
       administradorConexion.obtenerCliente({
+        idSocket: estado.idSocket,
+        id: uuid(),
         idCanal: estado.idCanal,
         idNegocio: estado.idNegocio,
         token: estado.token,

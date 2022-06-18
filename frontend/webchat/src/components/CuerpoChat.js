@@ -17,13 +17,20 @@ const CuerpoChat = (props) => {
 
         return (
           <div key={sesion.id}>
-            <Typography
-              align="center"
-              sx={{ fontSize: '10pt', color: 'dimgrey' }}
+            <List
+              className="lista-chat"
+              sx={{
+                position: 'relative',
+                maxHeight: '500px',
+                overflow: 'auto',
+              }}
             >
-              {moment(sesion.fecha).format('DD/MM/YYYY hh:mm:ss A')}
-            </Typography>
-            <List>
+              <Typography
+                align="center"
+                sx={{ fontSize: '10pt', color: 'dimgrey' }}
+              >
+                {moment(sesion.fecha).format('DD/MM/YYYY hh:mm:ss A')}
+              </Typography>
               {sesion.mensajes.map((mensaje) => {
                 if (mensaje.origen === 'bot' || mensaje.origen === 'agente') {
                   return (

@@ -28,15 +28,20 @@ class AdministradorConexion {
 
   #procesarMensajeWebsocket = (clienteWS) => {
     console.log(`connected to ${this.#serverAddr}`);
+    this.#setEstado((prevState) => ({
+      ...prevState,
+      idSocket: this.#socket.id,
+      forzarActualizarHistoral: true,
+    }));
 
-    this.#socket.on('recibiMensajeEntrante-webchat', (datos) => {
+    this.#socket.on('reconexion-webchat', () => {
       this.#setEstado((prevState) => ({
         ...prevState,
         forzarActualizarHistoral: true,
       }));
     });
 
-    this.#socket.on('reconexion-webchat', () => {
+    this.#socket.on('recibiMensajeEntrante-webchat', () => {
       this.#setEstado((prevState) => ({
         ...prevState,
         forzarActualizarHistoral: true,
@@ -86,11 +91,8 @@ class AdministradorConexion {
     this.#socket.emit('heartbeat', '');
   };
 
-  obtenerCliente = ({ idNegocio, idCanal, token }) => {
-    this.#socket.emit(
-      'webchat-obtenerCliente',
-      JSON.stringify({ idNegocio, idCanal, token })
-    );
+  obtenerCliente = (datos) => {
+    this.#socket.emit('webchat-obtenerCliente', JSON.stringify(datos));
   };
 
   buscarHistorialConversacion = (data) => {

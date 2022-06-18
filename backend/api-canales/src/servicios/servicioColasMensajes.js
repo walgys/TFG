@@ -30,11 +30,11 @@ class ServicioColasMensajes {
 
     this.#socket.on('respuestaObtenerMensajes', (datos) => {
       const objetoDatos = JSON.parse(datos);
-      const callback = this.#callbacks.find(
-        (callback) => callback.id === objetoDatos.idCallback
+      const callback = this.#callbacks?.find(
+        (callback) => callback?.id === objetoDatos.idCallback
       );
       this.#callbacks = this.#callbacks.filter(
-        (cb) => cb.id !== objetoDatos.idCallback
+        (cb) => cb?.id !== objetoDatos.idCallback
       );
       callback && callback.ejecutar(objetoDatos.mensajes);
     });
@@ -53,14 +53,14 @@ class ServicioColasMensajes {
     this.#socket.emit('agregarMensaje', JSON.stringify(mensaje));
   };
 
-  obtenerMensajes = ({ cantidad, callback, topico }) => {
+  obtenerMensajes = ({ cantidad, callback }) => {
     this.#callbacks.push(callback);
     this.#socket.emit(
       'obtenerMensajes',
       JSON.stringify({
         cantidad: cantidad,
         idCallback: callback.id,
-        topico: topico,
+        topico: 'respuesta-webchat',
       })
     );
   };

@@ -65,7 +65,11 @@ class ManejadorDatosInternos {
   };
 
   buscarCliente = async ({ idCliente }) => {
-    return await this.#firestoreDB.collection('clientes').doc(idCliente).get();
+    const cliente = await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .get();
+    return { id: cliente.id, ...cliente.data() };
   };
 
   buscarNegocio = async (idNegocio) => {

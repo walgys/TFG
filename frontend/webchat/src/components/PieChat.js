@@ -10,10 +10,11 @@ import './pieChat.scss';
 const PieChat = (props) => {
   const [textoEnviar, setTextoEnviar] = useState('');
   const { estado, setEstado, administradorConexion } = props;
-  const { sesiones, token, idCliente } = estado;
+  const { sesiones, token, idCliente, idSocket } = estado;
 
   const enviarMensaje = () => {
     const mensaje = {
+      idSocket: idSocket,
       idSesion: sesiones[sesiones.length - 1].id,
       idCliente: idCliente,
       texto: textoEnviar,

@@ -4,7 +4,7 @@
   "description": "",
   "main": "service.js",
   "scripts": {
-    "start": "node ./service.js"
+    "start": "nodemon --watch src/**/* ./src/service.js"
   },
   "keywords": [],
   "author": "",

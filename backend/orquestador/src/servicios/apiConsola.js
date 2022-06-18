@@ -9,8 +9,6 @@ class ApiConsola {
         origin: '*',
       },
     });
-
-    this.websocket.on('connection', this.procesarMensajeWebsocket);
     console.log('ApiConsola');
   }
 
@@ -23,6 +21,7 @@ class ApiConsola {
   configurar = (datosInternos, verificadorTokens) => {
     this.#datosInternos = datosInternos;
     this.#verificadorTokens = verificadorTokens;
+    this.websocket.on('connection', this.procesarMensajeWebsocket);
   };
 
   procesarMensajeWebsocket = (client) => {

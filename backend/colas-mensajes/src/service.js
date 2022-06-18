@@ -6,20 +6,42 @@ const io = require('socket.io')(server, {
   },
   path: '/',
 });
-const cola = new Cola();
+const colas = [];
 
 io.on('connection', (client) => {
   console.log('someone connected');
 
-  client.on('agregarMensaje', (mensaje) => {
-    console.log(`event: agregarMensaje, data: ${mensaje}`);
-    cola.ponerEnCola(JSON.parse(mensaje));
+  client.on('agregarMensaje', (datos) => {
+    const { topico, mensaje } = JSON.parse(datos);
+    const colaEncontrada = colas.find((cola) => cola.topico === topico);
+    let cola;
+    if (!colaEncontrada) {
+      cola = new Cola(topico);
+    } else {
+      cola = colaEncontrada.cola;
+    }
+
+    cola.ponerEnCola(mensaje);
+    colas.push({ topico: topico, cola: cola });
     client.emit('respuestaAgregarMensaje', mensaje);
   });
 
   client.on('obtenerMensajes', (datos) => {
     const objetoDatos = JSON.parse(datos);
-    const mensajes = cola.sacarDeCola(objetoDatos.cantidad);
+    const { topico } = objetoDatos;
+    if (topico === 'mensajeEntrante') {
+      console.log(topico);
+    }
+    let mensajes = [];
+    if (colas.length > 0) {
+      const colaEncontrada = colas.find((cola) => cola?.topico === topico);
+
+      if (colaEncontrada) {
+        const { cola } = colaEncontrada;
+        mensajes = cola.sacarDeCola(objetoDatos.cantidad);
+      }
+    }
+
     client.emit(
       'respuestaObtenerMensajes',
       JSON.stringify({

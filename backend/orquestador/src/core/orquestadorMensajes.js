@@ -33,7 +33,8 @@ class OrquestadorMensajes {
     administradorEntidades,
     manejadorDatosExternos,
     manejadorDatosInternos,
-    servicioPLN
+    servicioPLN,
+    topico
   ) => {
     this.#servicioColasMensajes = servicioColasMensajes;
     this.#administradorEntidades = administradorEntidades;
@@ -43,9 +44,13 @@ class OrquestadorMensajes {
 
     setInterval(
       () =>
-        this.#servicioColasMensajes.obtenerMensajes(this.#cantidadMensajes, {
-          id: uuidv4(),
-          ejecutar: this.#encolarMensajes,
+        this.#servicioColasMensajes.obtenerMensajes({
+          cantidad: this.#cantidadMensajes,
+          callback: {
+            id: uuidv4(),
+            ejecutar: this.#encolarMensajes,
+          },
+          topico,
         }),
       300
     );
