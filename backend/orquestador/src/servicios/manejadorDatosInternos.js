@@ -1,4 +1,4 @@
-const { initializeApp, applicationDefault } = require('firebase-admin/app');
+const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 const path = require('path');
@@ -18,6 +18,7 @@ class ManejadorDatosInternos {
       ),
     });
     this.#firestoreDB = getFirestore();
+    console.log('ManejadorDatosInternos');
   }
 
   static getInstancia() {
@@ -41,6 +42,21 @@ class ManejadorDatosInternos {
       .get();
   };
 
+  buscarIntencion = async (idNegocio, nombreIntencion) => {
+    const intenciones = await this.#firestoreDB
+      .collection('intenciones')
+      .where('negocio', '==', idNegocio)
+      .where('intencion', '==', nombreIntencion)
+      .get();
+
+    return Promise.all(
+      intenciones.docs.map((intencion) => ({
+        id: intencion.id,
+        ...intencion.data(),
+      }))
+    );
+  };
+
   buscarCanales = async (idNegocio) => {
     return await this.#firestoreDB
       .collection('canales')
@@ -48,11 +64,8 @@ class ManejadorDatosInternos {
       .get();
   };
 
-  buscarCliente = async (idNegocio) => {
-    return await this.#firestoreDB
-      .collection('clientes')
-      .where('negocio', '==', idNegocio)
-      .get();
+  buscarCliente = async ({ idCliente }) => {
+    return await this.#firestoreDB.collection('clientes').doc(idCliente).get();
   };
 
   buscarNegocio = async (idNegocio) => {
@@ -67,6 +80,35 @@ class ManejadorDatosInternos {
   grabarNegocio = () => {};
 
   grabarCliente = () => {};
+
+  crearCliente = async ({ idNegocio, idCanal }) => {
+    const estructuraBasica = {
+      estadoCliente: {
+        estadoUltimaRegla: '',
+        intencionEnEjecucion: '',
+        ultimaRegla: '',
+        variablesCliente: {
+          nombre: '',
+          valor: '',
+        },
+      },
+      fecha: moment(),
+    };
+
+    const idCliente = await this.#firestoreDB
+      .collection('clientes')
+      .add({ ...estructuraBasica, canal: idCanal, negocio: idNegocio });
+    return idCliente.id;
+  };
+
+  crearSesion = async (idCliente) => {
+    const sesion = await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .collection('sesiones')
+      .add({ fecha: moment() });
+    return sesion;
+  };
 
   grabarIntencion = () => {};
 
@@ -128,6 +170,31 @@ class ManejadorDatosInternos {
 
   buscarMensajes = async (idSesion, idCliente) => {
     return;
+  };
+
+  agregarMensaje = async ({ texto, origen, idCliente, idSesion }) => {
+    await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .collection('sesiones')
+      .doc(idSesion)
+      .collection('mensajes')
+      .add({
+        fecha: moment(),
+        origen: origen,
+        cuerpo: { estado: 'enviado', texto: texto },
+      });
+  };
+
+  buscarSesion = async ({ idSesion, idCliente }) => {
+    const sesion = await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .collection('sesiones')
+      .doc(idSesion)
+      .get();
+
+    return sesion;
   };
 
   verificarToken = async (token) => admin.auth().verifyIdToken(token);

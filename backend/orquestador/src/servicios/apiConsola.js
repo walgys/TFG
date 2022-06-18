@@ -1,10 +1,9 @@
 const io = require('socket.io');
-const { ManejadorDatosInternos } = require('./manejadorDatosInternos');
 class ApiConsola {
   static #instancia;
-
+  #datosInternos;
+  #verificadorTokens;
   constructor() {
-    this.datosInternos = ManejadorDatosInternos.getInstancia();
     this.websocket = new io.Server(8000, {
       cors: {
         origin: '*',
@@ -12,6 +11,7 @@ class ApiConsola {
     });
 
     this.websocket.on('connection', this.procesarMensajeWebsocket);
+    console.log('ApiConsola');
   }
 
   static getInstancia() {
@@ -20,6 +20,10 @@ class ApiConsola {
     }
     return this.#instancia;
   }
+  configurar = (datosInternos, verificadorTokens) => {
+    this.#datosInternos = datosInternos;
+    this.#verificadorTokens = verificadorTokens;
+  };
 
   procesarMensajeWebsocket = (client) => {
     console.log('someone connected');

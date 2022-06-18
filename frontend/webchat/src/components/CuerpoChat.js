@@ -47,7 +47,7 @@ const CuerpoChat = (props) => {
                       hora={moment
                         .unix(mensaje.fecha._seconds)
                         .format('hh:mm A')}
-                      estado={mensaje.estado}
+                      estado={mensaje.cuerpo?.estado}
                     />
                   );
                 }

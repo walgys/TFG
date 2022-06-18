@@ -1,6 +1,8 @@
 class ServicioColasAtencion {
   static #instancia;
-  constructor() {}
+  constructor() {
+    console.log('ServicioColasAtencion');
+  }
   static getInstancia() {
     if (!this.#instancia) {
       this.#instancia = new ServicioColasAtencion();

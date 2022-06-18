@@ -2,11 +2,14 @@ import { Typography } from '@mui/material';
 import React from 'react';
 import './encabezadoChat.scss';
 
-const EncabezadoChat = () => {
+const EncabezadoChat = (props) => {
+  const { estado } = props;
+  const { idNegocio } = estado;
+
   return (
     <div className="encabezado-chat-container">
       <Typography variant="body2" align="center" sx={{ fontWeight: '800' }}>
-        EncabezadoChat
+        {idNegocio}
       </Typography>
       <Typography
         align="center"

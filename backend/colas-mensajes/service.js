@@ -17,13 +17,16 @@ io.on('connection', (client) => {
     client.emit('respuestaAgregarMensaje', mensaje);
   });
 
-  client.on('obtenerMensaje', () => {
-    const mensaje = cola.sacarDeCola();
-    if (mensaje ?? null) {
-      client.emit('respuestaObtenerMensaje', JSON.stringify(mensaje));
-    } else {
-      client.emit('respuestaObtenerMensaje', '{}');
-    }
+  client.on('obtenerMensajes', (datos) => {
+    const objetoDatos = JSON.parse(datos);
+    const mensajes = cola.sacarDeCola(objetoDatos.cantidad);
+    client.emit(
+      'respuestaObtenerMensajes',
+      JSON.stringify({
+        idCallback: objetoDatos.idCallback,
+        mensajes: mensajes,
+      })
+    );
   });
 
   client.on('heartbeat', () => {

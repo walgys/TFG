@@ -4,15 +4,25 @@ import SentimentSatisfiedOutlinedIcon from '@mui/icons-material/SentimentSatisfi
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import SendIcon from '@mui/icons-material/Send';
 import React, { useContext, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import './pieChat.scss';
 
 const PieChat = (props) => {
   const [textoEnviar, setTextoEnviar] = useState('');
-  const { estado, setEstado, administradorConexion } = props
-  const { sesiones } = estado;
+  const { estado, setEstado, administradorConexion } = props;
+  const { sesiones, token, idCliente } = estado;
 
   const enviarMensaje = () => {
-    administradorConexion.enviarMensaje({ id: 1, texto: textoEnviar });
+    const mensaje = {
+      idSesion: sesiones[sesiones.length - 1].id,
+      idCliente: idCliente,
+      texto: textoEnviar,
+      origen: 'cliente',
+      token: token,
+      id: uuid(),
+    };
+
+    administradorConexion.enviarMensaje(mensaje);
     setTextoEnviar('');
   };
   return (

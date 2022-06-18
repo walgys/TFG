@@ -4,12 +4,14 @@ class ServicioColasMensajes {
   static #instancia;
   #serverAddr;
   #socket;
+  #callbacks = [];
   constructor() {
     this.#serverAddr = 'http://localhost:4000';
-    this.#socket = ioClient(this.serverAddr, {
+    this.#socket = ioClient(this.#serverAddr, {
       path: '/',
     });
     this.#socket.on('connect', this.#procesarMensajeWebsocket);
+    console.log('ServicioColasMensajes');
   }
 
   static getInstancia() {
@@ -20,14 +22,21 @@ class ServicioColasMensajes {
   }
 
   #procesarMensajeWebsocket = (client) => {
-    console.log('someone connected');
+    console.log('Conectado  ');
 
-    this.#socket.on('respuestaAgregarMensaje', (mensaje) => {
-      console.log(`event: respuestaAgregarMensaje, data: ${mensaje}`);
+    this.#socket.on('respuestaAgregarMensaje', (datos) => {
+      //console.log(`event: respuestaAgregarMensaje, data: ${datos}`);
     });
 
-    this.#socket.on('respuestaObtenerMensaje', (mensaje) => {
-      console.log(`event: respuestaObtenerMensaje, mensaje: ${mensaje}`);
+    this.#socket.on('respuestaObtenerMensajes', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const callback = this.#callbacks.find(
+        (callback) => callback.id === objetoDatos.idCallback
+      );
+      this.#callbacks = this.#callbacks.filter(
+        (cb) => cb.id !== objetoDatos.idCallback
+      );
+      callback && callback.ejecutar(objetoDatos.mensajes);
     });
 
     this.#socket.on('heartbeat', () => {
@@ -44,8 +53,12 @@ class ServicioColasMensajes {
     this.#socket.emit('agregarMensaje', JSON.stringify(mensaje));
   };
 
-  obtenerMensaje = () => {
-    this.#socket.emit('obtenerMensaje', '');
+  obtenerMensajes = (cantidad, callback) => {
+    this.#callbacks.push(callback);
+    this.#socket.emit(
+      'obtenerMensajes',
+      JSON.stringify({ cantidad: cantidad, idCallback: callback.id })
+    );
   };
 
   heartbeat = () => {

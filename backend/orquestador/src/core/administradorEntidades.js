@@ -1,7 +1,9 @@
 class AdministradorEntidades {
   static #instancia;
   #datosInternos;
-
+  constructor() {
+    console.log('AdministradorEntidades');
+  }
   static getInstancia() {
     if (!this.#instancia) {
       this.#instancia = new AdministradorEntidades();

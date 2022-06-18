@@ -11,6 +11,7 @@ class ServicioPLN {
         'Content-Type': 'application/json',
       },
     };
+    console.log('ServicioPLN');
   }
 
   static getInstancia() {

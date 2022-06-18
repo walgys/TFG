@@ -6,33 +6,78 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { CancelOutlined, Minimize } from '@mui/icons-material';
 import { Fab, Grow, makeStyles } from '@mui/material';
 import { useEffect, useState, useCallback } from 'react';
+import moment from 'moment';
+import { useCookies } from 'react-cookie';
 
 function App(props) {
-  const [estado, setEstado] = useState({ negocio: '', sesiones: [] });
+  const [estado, setEstado] = useState({
+    idNegocio: '',
+    idCanal: '',
+    sesiones: [],
+    idCliente: '',
+    token: '',
+    forzarActualizarHistoral: false,
+  });
   const [maximizado, setMaximizado] = useState(false);
   const { administradorConexion } = props;
+  const [cookies, setCookie, removeCookie] = useCookies(['botaidWebchatToken']);
 
   const minMax = () => {
     setMaximizado(!maximizado);
   };
 
-  const obtenerConfigCallback = useCallback(()=>fetch('./config.json').then((res) => {
-      return res.json();
-    }).then(data => {
-      setEstado({ ...estado, negocio: data.negocio });
-    }),[estado.negocio]);
+  const obtenerConfigCallback = useCallback(() => {
+    fetch('./config.json')
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setEstado((prevState) => ({
+          ...prevState,
+          idNegocio: data.idNegocio,
+          idCanal: data.idCanal,
+          actualizado: moment().unix(),
+        }));
+      });
+  }, [estado.idNegocio]);
+
+  useEffect(() => {
+    if (
+      estado.idCliente != '' ||
+      (estado.idCliente != '' && estado.forzarActualizarHistoral)
+    ) {
+      administradorConexion.buscarHistorialConversacion({
+        idCliente: estado.idCliente,
+        token: estado.token,
+      });
+      setEstado((prevState) => ({
+        ...prevState,
+        forzarActualizarHistoral: false,
+      }));
+    }
+  }, [estado.idCliente, estado.forzarActualizarHistoral]);
+
+  useEffect(() => {
+    if (cookies.botaidWebchatToken)
+      setEstado((prevState) => ({
+        ...prevState,
+        token: cookies.botaidWebchatToken,
+      }));
+  }, [cookies.botaidWebchatToken]);
 
   useEffect(() => {
     obtenerConfigCallback();
-    administradorConexion.configurar(setEstado);
-    administradorConexion.buscarHistorialConversacion({
-      idCliente: 'NQk1VIFVX7i0iKOfazow',
-    });
+    administradorConexion.configurar(setEstado, setCookie);
   }, []);
 
   useEffect(() => {
-    console.log(estado);
-  }, [estado]);
+    if (estado.idCanal !== '' && estado.idNegocio !== '')
+      administradorConexion.obtenerCliente({
+        idCanal: estado.idCanal,
+        idNegocio: estado.idNegocio,
+        token: estado.token,
+      });
+  }, [estado.idCanal, estado.idNegocio, estado.token]);
 
   const propiedadesCompartidas = { estado, setEstado, administradorConexion };
 

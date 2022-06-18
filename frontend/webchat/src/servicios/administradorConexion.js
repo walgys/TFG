@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const ioClient = require('socket.io-client');
 
 class AdministradorConexion {
@@ -5,6 +7,7 @@ class AdministradorConexion {
   #serverAddr;
   #socket;
   #setEstado;
+  #setCookie;
   constructor() {
     this.#serverAddr = 'http://localhost:9000';
     this.#socket = ioClient.connect(this.#serverAddr);
@@ -18,22 +21,50 @@ class AdministradorConexion {
     return this.#instancia;
   }
 
-  configurar = (setEstado) => {
+  configurar = (setEstado, setCookie) => {
     this.#setEstado = setEstado;
+    this.#setCookie = setCookie;
   };
 
-  #procesarMensajeWebsocket = (client) => {
+  #procesarMensajeWebsocket = (clienteWS) => {
     console.log(`connected to ${this.#serverAddr}`);
 
-    this.#socket.on('recibiMensajeEntrante-webchat', (data) => {
-      console.log(data);
-    });
-
-    this.#socket.on('respuestabuscarHistorialConversacion-webchat', (data) => {
-      const parsedData = JSON.parse(data);
+    this.#socket.on('recibiMensajeEntrante-webchat', (datos) => {
       this.#setEstado((prevState) => ({
         ...prevState,
-        sesiones: parsedData.sesiones,
+        forzarActualizarHistoral: true,
+      }));
+    });
+
+    this.#socket.on('reconexion-webchat', () => {
+      this.#setEstado((prevState) => ({
+        ...prevState,
+        forzarActualizarHistoral: true,
+      }));
+    });
+
+    this.#socket.on('registrar-webchat', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      this.#setCookie('botaidWebchatToken', objetoDatos.token);
+      this.#setEstado((prevState) => ({
+        ...prevState,
+        token: objetoDatos.token,
+      }));
+    });
+
+    this.#socket.on('respuestaObtenerCliente-webchat', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      this.#setEstado((prevState) => ({
+        ...prevState,
+        idCliente: objetoDatos.idCliente,
+      }));
+    });
+
+    this.#socket.on('respuestaBuscarHistorialConversacion-webchat', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      this.#setEstado((prevState) => ({
+        ...prevState,
+        sesiones: objetoDatos.sesiones,
       }));
     });
 
@@ -55,8 +86,11 @@ class AdministradorConexion {
     this.#socket.emit('heartbeat', '');
   };
 
-  obtenerCliente = () => {
-    this.#socket.emit('webchat-nuevoCliente');
+  obtenerCliente = ({ idNegocio, idCanal, token }) => {
+    this.#socket.emit(
+      'webchat-obtenerCliente',
+      JSON.stringify({ idNegocio, idCanal, token })
+    );
   };
 
   buscarHistorialConversacion = (data) => {
