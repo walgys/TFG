@@ -36,8 +36,7 @@ function esTokenValido(token, idSocket) {
 
 async function procesarMensajeEntrante(datos) {
   const objetoDatos = JSON.parse(datos);
-  const { texto, token, idSesion, idCliente, origen, id, idSocket } =
-    objetoDatos;
+  const { token, idSesion, idCliente, idSocket } = objetoDatos;
 
   const tokenDecofificado = esTokenValido(token, idSocket);
   if (tokenDecofificado) {
@@ -57,11 +56,8 @@ async function procesarMensajeEntrante(datos) {
     }
 
     manejadorDatosInternos.agregarMensaje({
-      texto: texto,
-      idSesion: sesion.id,
-      idCliente: idCliente,
-      idSocket: idSocket,
-      origen: origen,
+      ...objetoDatos,
+      sesion: sesion.id,
     });
 
     manejadorColasMensajes.agregarMensaje({
@@ -70,19 +66,18 @@ async function procesarMensajeEntrante(datos) {
         endpoint: 'recibiMensajeEntrante-webchat',
         datos: {
           idSocket: idSocket,
-          mensaje: JSON.stringify({ id: objetoDatos.id, estado: 'ok' }),
+          mensaje: {
+            ...objetoDatos,
+            sesion: sesion.id,
+          },
         },
       },
     });
     const datos = {
       idSocket: idSocket,
       mensaje: JSON.stringify({
-        id: id,
-        texto: texto,
-        idNegocio: idNegocio,
-        idSesion: sesion.id,
-        idCliente: idCliente,
-        origen: origen,
+        ...objetoDatos,
+        sesion: sesion.id,
       }),
     };
     manejadorColasMensajes.agregarMensaje({
@@ -142,10 +137,9 @@ async function procesarObtenerCliente(datos) {
 
 async function procesarBuscarHistorialConversacion(datos) {
   const objetoDatos = JSON.parse(datos);
-  const { idSocket } = objetoDatos;
+  const { idSocket, idCliente, id } = objetoDatos;
   const tokenDecofificado = esTokenValido(objetoDatos.token, idSocket);
   if (tokenDecofificado) {
-    const { idCliente } = objetoDatos;
     let sesiones = await manejadorDatosInternos.buscarHistorialConversacion(
       idCliente
     );
@@ -161,6 +155,7 @@ async function procesarBuscarHistorialConversacion(datos) {
           texto: mensaje,
           idSesion: nuevaSesion.id,
           idCliente: idCliente,
+          id: id,
           origen: 'bot',
         });
         sesiones = await manejadorDatosInternos.buscarHistorialConversacion(
@@ -170,7 +165,7 @@ async function procesarBuscarHistorialConversacion(datos) {
     }
     const datos = {
       idSocket: idSocket,
-      mensaje: JSON.stringify({ idCliente: idCliente, sesiones: sesiones }),
+      mensaje: { idCliente: idCliente, sesiones: sesiones },
     };
     manejadorColasMensajes.agregarMensaje({
       topico: 'respuesta-webchat',

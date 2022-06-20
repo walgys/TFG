@@ -12,6 +12,7 @@ class ManejadorDialogos {
     administradorEntidades,
     manejadorDatosExternos,
     manejadorDatosInternos,
+    administradorReglas,
     servicioPLN,
     uuid,
     mensaje,
@@ -29,9 +30,13 @@ class ManejadorDialogos {
   }
 
   #procesarMensaje = async () => {
-    const { idCliente, texto } = this.#mensaje;
-    const datosCliente = this.#manejadorDatosInternos.buscarCliente(idCliente);
-    const { topico } = datosCliente.estado;
+    const { idSocket, mensaje } = this.#mensaje.datos;
+    const { idCliente, texto } = JSON.parse(mensaje);
+
+    const datosCliente = await this.#manejadorDatosInternos.buscarCliente({
+      idCliente,
+    });
+    const { topico } = datosCliente.estadoCliente;
     const data = {
       idNegocio: 'MiTienda',
       contexto: {
@@ -39,8 +44,10 @@ class ManejadorDialogos {
       },
       clienteDice: texto,
     };
-    const intencionesSimilares = this.#servicioPLN.buscarSimilitud(data);
+    const intencionesSimilares = await this.#servicioPLN.buscarSimilitud(data);
     const mejorIntencion = intencionesSimilares?.similarities?.shift();
+
+    this.#manejadorDatosInternos.actualizarEstadoCliente();
     console.log(mejorIntencion);
 
     this.#terminar({ uuid: this.#uuid, resultado: mejorIntencion });

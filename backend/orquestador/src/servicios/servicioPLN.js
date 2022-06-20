@@ -20,11 +20,11 @@ class ServicioPLN {
     }
     return this.#instancia;
   }
-  buscarSimilitud = async (data, endpoint) => {
+  buscarSimilitud = async (data) => {
     try {
       const newConfig = {
-        ...this.config,
-        url: this.config.url + endpoint,
+        ...this.#config,
+        url: this.#config.url + 'buscarSimilitud',
         data: JSON.stringify(data),
       };
       const res = await axios(newConfig);

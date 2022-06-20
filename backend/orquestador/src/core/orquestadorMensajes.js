@@ -11,6 +11,7 @@ class OrquestadorMensajes {
   #colaMensajes = [];
   #cantidadMensajes;
   #cantidadInstanciasMD;
+  #administradorReglas;
 
   constructor(cantidadMensajes, cantidadInstanciasMD) {
     this.#cantidadMensajes = cantidadMensajes;
@@ -28,18 +29,20 @@ class OrquestadorMensajes {
     return this.#instancia;
   }
 
-  configurar = (
+  configurar = ({
     servicioColasMensajes,
     administradorEntidades,
     manejadorDatosExternos,
     manejadorDatosInternos,
     servicioPLN,
-    topico
-  ) => {
+    topico,
+    administradorReglas,
+  }) => {
     this.#servicioColasMensajes = servicioColasMensajes;
     this.#administradorEntidades = administradorEntidades;
     this.#manejadorDatosExternos = manejadorDatosExternos;
     this.#manejadorDatosInternos = manejadorDatosInternos;
+    this.#administradorReglas = administradorReglas;
     this.#servicioPLN = servicioPLN;
 
     setInterval(
@@ -75,15 +78,16 @@ class OrquestadorMensajes {
         this.#colaMD.length <= this.#cantidadInstanciasMD
       ) {
         const uuid = uuidv4();
-        const manejadorMD = new ManejadorDialogos(
-          this.#administradorEntidades,
-          this.#manejadorDatosExternos,
-          this.#manejadorDatosInternos,
-          this.#servicioPLN,
-          uuid,
-          this.#colaMensajes.shift(),
-          this.terminar
-        );
+        const manejadorMD = new ManejadorDialogos({
+          administradoEntidades: this.#administradorEntidades,
+          administradorDatosExternos: this.#manejadorDatosExternos,
+          manejadorDatosInternos: this.#manejadorDatosInternos,
+          servicioPLN: this.#servicioPLN,
+          id: uuid,
+          mensaje: this.#colaMensajes.shift(),
+          terminar: this.terminar,
+          administradorReglas: this.#administradorReglas,
+        });
         this.#colaMD.push({ uuid: uuid, manejadorMD: manejadorMD });
       }
     }

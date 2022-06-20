@@ -91,6 +91,7 @@ class ManejadorDatosInternos {
         estadoUltimaRegla: '',
         intencionEnEjecucion: '',
         ultimaRegla: '',
+        topico: 'inicio',
         variablesCliente: {
           nombre: '',
           valor: '',
@@ -176,17 +177,25 @@ class ManejadorDatosInternos {
     return;
   };
 
-  agregarMensaje = async ({ texto, origen, idCliente, idSesion }) => {
+  agregarMensaje = async ({
+    texto,
+    origen,
+    idCliente,
+    idSesion,
+    id,
+    fecha,
+  }) => {
     await this.#firestoreDB
       .collection('clientes')
       .doc(idCliente)
       .collection('sesiones')
       .doc(idSesion)
       .collection('mensajes')
-      .add({
-        fecha: moment(),
+      .doc(id)
+      .set({
+        fecha: moment.unix(fecha._seconds),
         origen: origen,
-        cuerpo: { estado: 'enviado', texto: texto },
+        cuerpo: { estado: 'recibido', texto: texto },
       });
   };
 

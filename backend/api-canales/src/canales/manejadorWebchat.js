@@ -49,6 +49,7 @@ class ManejadorWebchat {
     clienteWS.emit('reconexion-webchat', '');
 
     clienteWS.on('webchat-mensajeEntrante', (datos) => {
+      clienteWS.emit('enviadoMensajeEntrante-webchat', datos);
       this.#manejadorColasMensajes.agregarMensaje({
         topico: 'mensajeEntrante',
         mensaje: { endpoint: 'webchat-mensajeEntrante', datos: datos },

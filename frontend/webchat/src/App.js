@@ -44,9 +44,7 @@ function App(props) {
   }, [estado.idNegocio]);
 
   useEffect(() => {
-    if (
-      (estado.idCliente != '' && estado.forzarActualizarHistoral)
-    ) {
+    if (estado.idCliente != '' && estado.forzarActualizarHistoral) {
       administradorConexion.buscarHistorialConversacion({
         idSocket: estado.idSocket,
         id: uuid(),
@@ -69,13 +67,13 @@ function App(props) {
   }, [cookies.botaidWebchatToken]);
 
   useEffect(() => {
+    console.log(estado);
+  }, [estado]);
+
+  useEffect(() => {
     obtenerConfigCallback();
     administradorConexion.configurar(setEstado, setCookie);
   }, []);
-
-  useEffect(() => {
-    console.log(estado);
-  }, [estado]);
 
   useEffect(() => {
     if (estado.idCanal !== '' && estado.idNegocio !== '' && estado.idSocket)

@@ -19,6 +19,7 @@ const MensajeEnviado = (props) => {
     enviado: '✓',
     recibido: '✓✓',
     error: '🗙',
+    esperando: '◴',
   };
   return (
     <ListItem sx={{ alignItems: 'flex-end', justifyContent: 'flex-end' }}>

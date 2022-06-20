@@ -3,6 +3,7 @@ const { OrquestadorMensajes } = require('../core/orquestadorMensajes');
 const {
   ProcesadorMensajesEntrantes,
 } = require('../core/procesadorMensajesEntrantes');
+const { AdministradorReglas } = require('../core/reglas/administradorReglas');
 const { ApiConsola } = require('./apiConsola');
 const { ManejadorDatosExternos } = require('./manejadorDatosExternos');
 const { ManejadorDatosInternos } = require('./manejadorDatosInternos');
@@ -27,6 +28,7 @@ class ManejadorServicios {
     const administradorEntidades = AdministradorEntidades.getInstancia();
     const verificadorTokens = VerificadorTokens.getInstancia();
     const orquestadorMensajes = OrquestadorMensajes.getInstancia(50, 5);
+    const administradorReglas = AdministradorReglas.getInstancia();
 
     this.servicios = {
       manejadorDatosInternos,
@@ -40,6 +42,7 @@ class ManejadorServicios {
       verificadorTokens,
       orquestadorMensajes,
       manejadorServicios: this,
+      administradorReglas,
     };
 
     setTimeout(this.configurarServicios, 1000);
@@ -61,14 +64,15 @@ class ManejadorServicios {
       this.servicios.verificadorTokens
     );
 
-    /*await this.servicios.orquestadorMensajes.configurar(
-      this.servicios.servicioColasMensajes,
-      this.servicios.administradorEntidades,
-      this.servicios.manejadorDatosExternos,
-      this.servicios.manejadorDatosInternos,
-      this.servicios.servicioPLN,
-      'orquestadorManejadorDialogos'
-    );*/
+    await this.servicios.orquestadorMensajes.configurar({
+      servicioColasMensajes: this.servicios.servicioColasMensajes,
+      administradorEntidades: this.servicios.administradorEntidades,
+      manejadorDatosExternos: this.servicios.manejadorDatosExternos,
+      manejadorDatosInternos: this.servicios.manejadorDatosInternos,
+      servicioPLN: this.servicios.servicioPLN,
+      topico: 'orquestadorManejadorDialogos',
+      administradorReglas: this.servicios.administradorReglas,
+    });
 
     await this.servicios.procesadorMensajesEntrantes.configurar(
       this.servicios.servicioColasMensajes,

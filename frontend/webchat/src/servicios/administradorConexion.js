@@ -41,11 +41,19 @@ class AdministradorConexion {
       }));
     });
 
-    this.#socket.on('recibiMensajeEntrante-webchat', () => {
-      this.#setEstado((prevState) => ({
-        ...prevState,
-        forzarActualizarHistoral: true,
-      }));
+    this.#socket.on('enviadoMensajeEntrante-webchat', (datos) => {
+      //confirmar recepción del mensaje
+      const objetoDatos = JSON.parse(datos);
+      const { id } = objetoDatos;
+      this.#cambiarEstadoMensaje(id, 'enviado');
+    });
+
+    this.#socket.on('recibiMensajeEntrante-webchat', (datos) => {
+      //confirmar recepción del mensaje
+
+      const objetoDatos = JSON.parse(datos);
+      const { id } = objetoDatos;
+      this.#cambiarEstadoMensaje(id, 'recibido');
     });
 
     this.#socket.on('registrar-webchat', (datos) => {
@@ -100,6 +108,29 @@ class AdministradorConexion {
       'webchat-buscarHistorialConversacion',
       JSON.stringify(data)
     );
+  };
+
+  #cambiarEstadoMensaje = (id, estado) => {
+    this.#setEstado((prevState) => {
+      const sesiones = prevState.sesiones.map((sesion, indice) => {
+        if (indice === prevState.sesiones.length - 1) {
+          const mensajes = sesion.mensajes.map((mensaje) => {
+            if (mensaje.id === id) {
+              return {
+                ...mensaje,
+                cuerpo: { ...mensaje.cuerpo, estado: estado },
+              };
+            } else {
+              return mensaje;
+            }
+          });
+          return { ...sesion, mensajes: mensajes };
+        } else {
+          return sesion;
+        }
+      });
+      return { ...prevState, sesiones: sesiones };
+    });
   };
 }
 

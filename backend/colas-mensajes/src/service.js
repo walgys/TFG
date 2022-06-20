@@ -29,9 +29,7 @@ io.on('connection', (client) => {
   client.on('obtenerMensajes', (datos) => {
     const objetoDatos = JSON.parse(datos);
     const { topico } = objetoDatos;
-    if (topico === 'mensajeEntrante') {
-      console.log(topico);
-    }
+
     let mensajes = [];
     if (colas.length > 0) {
       const colaEncontrada = colas.find((cola) => cola?.topico === topico);
