@@ -50,11 +50,12 @@ class AdministradorConexion {
 
     this.#socket.on('recibiMensajeEntrante-webchat', (datos) => {
       //confirmar recepción del mensaje
-
       const objetoDatos = JSON.parse(datos);
       const { id } = objetoDatos;
       this.#cambiarEstadoMensaje(id, 'recibido');
     });
+
+    this.#socket.on('mensajeBotEntrante-webchat', (datos) => {});
 
     this.#socket.on('registrar-webchat', (datos) => {
       const objetoDatos = JSON.parse(datos);

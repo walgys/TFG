@@ -87,6 +87,7 @@ class OrquestadorMensajes {
           mensaje: this.#colaMensajes.shift(),
           terminar: this.terminar,
           administradorReglas: this.#administradorReglas,
+          servicioColasMensajes: this.#servicioColasMensajes,
         });
         this.#colaMD.push({ uuid: uuid, manejadorMD: manejadorMD });
       }

@@ -25,7 +25,10 @@ def obtener_dominios_e_intenciones(negocio):
         intenciones = []
 
         for inten in lista_intenciones:
-            intenciones.append(inten.to_dict())
+            data = inten.to_dict()
+            data["id"] = inten.id
+            print(data)
+            intenciones.append(data)
 
         dominio_objeto = dominio.to_dict()
         dominio_objeto["intenciones"] = intenciones

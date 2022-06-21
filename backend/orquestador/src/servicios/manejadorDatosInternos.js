@@ -46,7 +46,7 @@ class ManejadorDatosInternos {
     const intenciones = await this.#firestoreDB
       .collection('intenciones')
       .where('negocio', '==', idNegocio)
-      .where('intencion', '==', nombreIntencion)
+      .where('id', '==', nombreIntencion)
       .get();
 
     return Promise.all(
@@ -91,6 +91,8 @@ class ManejadorDatosInternos {
         estadoUltimaRegla: '',
         intencionEnEjecucion: '',
         ultimaRegla: '',
+        proximaRegla: '',
+        botActivado: true,
         topico: 'inicio',
         variablesCliente: {
           nombre: '',
@@ -104,6 +106,13 @@ class ManejadorDatosInternos {
       .collection('clientes')
       .add({ ...estructuraBasica, canal: idCanal, negocio: idNegocio });
     return idCliente.id;
+  };
+
+  actualizarDatosCliente = async (datosClienteActualizado, idCliente) => {
+    await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .update(datosClienteActualizado);
   };
 
   crearSesion = async (idCliente) => {

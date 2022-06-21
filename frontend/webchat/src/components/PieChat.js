@@ -10,13 +10,14 @@ import moment from 'moment';
 const PieChat = (props) => {
   const [textoEnviar, setTextoEnviar] = useState('');
   const { estado, setEstado, administradorConexion } = props;
-  const { sesiones, token, idCliente, idSocket } = estado;
+  const { sesiones, token, idCliente, idSocket, idNegocio } = estado;
 
   const enviarMensaje = () => {
     const mensaje = {
       idSocket: idSocket,
       idSesion: sesiones[sesiones.length - 1].id,
       idCliente: idCliente,
+      idNegocio: idNegocio,
       texto: textoEnviar,
       fecha: { _seconds: moment().unix() },
       origen: 'cliente',

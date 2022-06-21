@@ -66,10 +66,10 @@ async function procesarMensajeEntrante(datos) {
         endpoint: 'recibiMensajeEntrante-webchat',
         datos: {
           idSocket: idSocket,
-          mensaje: {
+          mensaje: JSON.stringify({
             ...objetoDatos,
             sesion: sesion.id,
-          },
+          }),
         },
       },
     });
@@ -101,7 +101,7 @@ async function procesarObtenerCliente(datos) {
     });
 
     let datos = {
-      idCliente: idCliente,
+      idSocket: idSocket,
       mensaje: JSON.stringify({
         idCliente: idCliente,
         token: token,
@@ -165,7 +165,7 @@ async function procesarBuscarHistorialConversacion(datos) {
     }
     const datos = {
       idSocket: idSocket,
-      mensaje: { idCliente: idCliente, sesiones: sesiones },
+      mensaje: JSON.stringify({ idCliente: idCliente, sesiones: sesiones }),
     };
     manejadorColasMensajes.agregarMensaje({
       topico: 'respuesta-webchat',
