@@ -157,6 +157,7 @@ async function procesarBuscarHistorialConversacion(datos) {
           idCliente: idCliente,
           id: id,
           origen: 'bot',
+          fecha: { _seconds: moment().unix() },
         });
         sesiones = await manejadorDatosInternos.buscarHistorialConversacion(
           idCliente

@@ -55,7 +55,9 @@ class ManejadorDialogos {
     if (botActivado) {
       if (intencionEnEjecucion !== '') {
         mejorIntencion =
-          this.#manejadorDatosInternos.buscarIntencion(intencionEnEjecucion);
+          await this.#manejadorDatosInternos.buscarIntencionPorId(
+            intencionEnEjecucion
+          );
       }
       if (
         intencionEnEjecucion == '' ||
@@ -76,72 +78,111 @@ class ManejadorDialogos {
 
       //continuar aqui
       if (mejorIntencion.intencion !== 'NO_ENTIENDE') {
+        let intencionCumplida;
         let reglaAEjecutar;
         let indiceReglaAEjecutar = 0;
+        let datosClienteActualizado;
         while (mejorIntencion.reglas.length > indiceReglaAEjecutar) {
-          if (ultimaRegla === '' && proximaRegla === '') {
-            reglaAEjecutar = mejorIntencion.reglas[0];
-          } else if (proximaRegla !== '') {
-            mejorIntencion.reglas.forEach((regla, indice) => {
-              if (regla.id === proximaRegla) {
-                reglaAEjecutar = regla;
-                indiceReglaAEjecutar = indice;
-              }
-            });
-          }
-          const reglaEncontrada = this.#administradorReglas.buscarRegla(
-            reglaAEjecutar.tipo
-          );
-          if (reglaEncontrada) {
-            let objetoConfiguracion = {
-              administradorEntidades: this.#administradorEntidades,
-              manejadorDatosExternos: this.#manejadorDatosExternos,
-              manejadorDatosInternos: this.#manejadorDatosInternos,
-              servicioColasMensajes: this.#servicioColasMensajes,
-              mensajeEntrante: this.#mensaje,
-            };
-
-            if (reglaAEjecutar.configuracion.texto) {
-              objetoConfiguracion = {
-                ...objetoConfiguracion,
-                texto: reglaAEjecutar.configuracion.texto,
-              };
-            }
-            const resultado =
-              reglaEncontrada.ejecutarRegla(objetoConfiguracion);
-
-            let datosClienteActualizado;
-            if (resultado.cambioIntencion) {
-              datosClienteActualizado = {
-                ...datosCliente,
-                estadoCliente: {
-                  ...datosCliente.estadoCliente,
-                  intencionEnEjecucion: resultado.nuevaIntencion,
-                  ultimaRegla: '',
-                  proximaRegla: '',
-                },
-              };
+          if (intencionEnEjecucion != '') {
+            if (proximaRegla !== '') {
+              mejorIntencion.reglas.forEach((regla, indice) => {
+                if (regla.id === proximaRegla) {
+                  reglaAEjecutar = regla;
+                  indiceReglaAEjecutar = indice;
+                } else {
+                  intencionCumplida = true;
+                }
+              });
             } else {
-              datosClienteActualizado = {
-                ...datosCliente,
-                estadoCliente: {
-                  ...datosCliente.estadoCliente,
-                  intencionEnEjecucion: mejorIntencion.id,
-                  estadoIntencion: '',
-                  ultimaRegla: reglaAEjecutar.id,
-                  proximaRegla:
-                    mejorIntencion.reglas.length - 1 === indiceReglaAEjecutar
-                      ? ''
-                      : mejorIntencion.reglas[indiceReglaAEjecutar + 1].id,
-                },
-              };
+              intencionCumplida = true;
             }
+          } else if (ultimaRegla === '' && proximaRegla === '') {
+            reglaAEjecutar = mejorIntencion.reglas[0];
+          }
+
+          if (!intencionCumplida) {
+            const reglaEncontrada = this.#administradorReglas.buscarRegla(
+              reglaAEjecutar.tipo
+            );
+
+            if (reglaEncontrada) {
+              let objetoConfiguracion = {
+                administradorEntidades: this.#administradorEntidades,
+                manejadorDatosExternos: this.#manejadorDatosExternos,
+                manejadorDatosInternos: this.#manejadorDatosInternos,
+                servicioColasMensajes: this.#servicioColasMensajes,
+                mensajeEntrante: this.#mensaje,
+              };
+
+              if (reglaAEjecutar.configuracion.texto) {
+                objetoConfiguracion = {
+                  ...objetoConfiguracion,
+                  texto: reglaAEjecutar.configuracion.texto,
+                };
+              }
+              const resultado =
+                reglaEncontrada.ejecutarRegla(objetoConfiguracion);
+
+              if (resultado.cambioIntencion) {
+                datosClienteActualizado = {
+                  ...datosCliente,
+                  estadoCliente: {
+                    ...datosCliente.estadoCliente,
+                    intencionEnEjecucion: resultado.nuevaIntencion,
+                    ultimaRegla: '',
+                    proximaRegla: '',
+                  },
+                };
+              } else {
+                if (mejorIntencion.reglas.length - 1 == indiceReglaAEjecutar) {
+                  datosClienteActualizado = {
+                    ...datosCliente,
+                    estadoCliente: {
+                      ...datosCliente.estadoCliente,
+                      intencionEnEjecucion: '',
+                      ultimaRegla: '',
+                      proximaRegla: '',
+                    },
+                  };
+                } else {
+                  datosClienteActualizado = {
+                    ...datosCliente,
+                    estadoCliente: {
+                      ...datosCliente.estadoCliente,
+                      intencionEnEjecucion: mejorIntencion.id,
+                      estadoIntencion: '',
+                      ultimaRegla: reglaAEjecutar.id,
+                      proximaRegla:
+                        mejorIntencion.reglas.length - 1 ===
+                        indiceReglaAEjecutar
+                          ? ''
+                          : mejorIntencion.reglas[indiceReglaAEjecutar + 1].id,
+                    },
+                  };
+                }
+              }
+              this.#manejadorDatosInternos.actualizarDatosCliente(
+                datosClienteActualizado,
+                idCliente
+              );
+              indiceReglaAEjecutar += 1;
+              if (reglaAEjecutar.configuracion?.necesitaRespuesta) return;
+            }
+          } else {
+            datosClienteActualizado = {
+              ...datosCliente,
+              estadoCliente: {
+                ...datosCliente.estadoCliente,
+                intencionEnEjecucion: '',
+                ultimaRegla: '',
+                proximaRegla: '',
+              },
+            };
             this.#manejadorDatosInternos.actualizarDatosCliente(
               datosClienteActualizado,
               idCliente
             );
             indiceReglaAEjecutar += 1;
-            if (reglaAEjecutar.configuracion?.necesitaRespuesta) return;
           }
         }
       }

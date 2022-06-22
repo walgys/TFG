@@ -46,7 +46,7 @@ class ManejadorDatosInternos {
     const intenciones = await this.#firestoreDB
       .collection('intenciones')
       .where('negocio', '==', idNegocio)
-      .where('id', '==', nombreIntencion)
+      .where('intencion', '==', nombreIntencion)
       .get();
 
     return Promise.all(
@@ -55,6 +55,15 @@ class ManejadorDatosInternos {
         ...intencion.data(),
       }))
     );
+  };
+
+  buscarIntencionPorId = async (nombreIntencion) => {
+    const intencion = await this.#firestoreDB
+      .collection('intenciones')
+      .doc(nombreIntencion)
+      .get();
+
+    return { id: intencion.id, ...intencion.data() };
   };
 
   buscarCanales = async (idNegocio) => {

@@ -18,13 +18,19 @@ class DECIR_INMEDIATAMENTE {
       id: uuidv4(),
       fecha: { _seconds: moment().unix() },
     };
+    const mensajeAWebchat = {
+      cuerpo: { estado: 'recibido', texto: texto },
+      origen: 'bot',
+      id: uuidv4(),
+      fecha: { _seconds: moment().unix() },
+    };
     manejadorDatosInternos.agregarMensaje(nuevoMensaje);
 
     servicioColasMensajes.agregarMensaje({
       topico: 'respuesta-webchat',
       mensaje: {
         endpoint: 'mensajeBotEntrante-webchat',
-        datos: { idSocket: idSocket, mensaje: JSON.stringify(nuevoMensaje) },
+        datos: { idSocket: idSocket, mensaje: JSON.stringify(mensajeAWebchat) },
       },
     });
     return { resultado: 'ok' };

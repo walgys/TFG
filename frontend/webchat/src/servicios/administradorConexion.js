@@ -55,7 +55,23 @@ class AdministradorConexion {
       this.#cambiarEstadoMensaje(id, 'recibido');
     });
 
-    this.#socket.on('mensajeBotEntrante-webchat', (datos) => {});
+    this.#socket.on('mensajeBotEntrante-webchat', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+
+      this.#setEstado((prevState) => {
+        const sesiones = prevState.sesiones.map((sesion, indice) => {
+          if (indice == prevState.sesiones.length - 1) {
+            return {
+              ...sesion,
+              mensajes: [...sesion.mensajes, { ...objetoDatos }],
+            };
+          } else {
+            return sesion;
+          }
+        });
+        return { ...prevState, sesiones: sesiones };
+      });
+    });
 
     this.#socket.on('registrar-webchat', (datos) => {
       const objetoDatos = JSON.parse(datos);
