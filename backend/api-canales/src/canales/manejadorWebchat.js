@@ -93,7 +93,7 @@ class ManejadorWebchat {
       const { endpoint, datos } = mensajeSaliente;
       const { idSocket, mensaje } = datos;
       this.#websocket.fetchSockets(idSocket).then((socket) => {
-        socket[0].emit(endpoint, mensaje);
+        socket.find((socket) => socket.id === idSocket).emit(endpoint, mensaje);
       });
     }
   };

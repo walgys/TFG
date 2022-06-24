@@ -58,6 +58,7 @@ async function procesarMensajeEntrante(datos) {
     manejadorDatosInternos.agregarMensaje({
       ...objetoDatos,
       sesion: sesion.id,
+      cuerpo: { ...objetoDatos.cuerpo, estado: 'recibido' },
     });
 
     manejadorColasMensajes.agregarMensaje({

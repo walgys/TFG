@@ -1,23 +1,29 @@
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
-class DECIR_INMEDIATAMENTE {
+
+class MENU {
   ejecutarRegla = ({
+    servicioColasMensajes,
     configuracionRegla,
     mensajeEntrante,
-    servicioColasMensajes,
     manejadorDatosInternos,
   }) => {
-    //continuar aqui
+    const { opciones, titulo } = configuracionRegla;
     const { idSocket, mensaje } = mensajeEntrante.datos;
     const { idCliente, idSesion } = JSON.parse(mensaje);
-    const { texto } = configuracionRegla;
 
     const mensajeAWebchat = {
-      cuerpo: { estado: 'recibido', texto: texto },
+      cuerpo: {
+        tipo: 'MENU',
+        opciones: opciones,
+        titulo: titulo,
+        estado: 'recibido',
+      },
       origen: 'bot',
       id: uuidv4(),
       fecha: { _seconds: moment().unix() },
     };
+
     manejadorDatosInternos.agregarMensaje({
       ...mensajeAWebchat,
       idCliente: idCliente,
@@ -35,4 +41,4 @@ class DECIR_INMEDIATAMENTE {
   };
 }
 
-module.exports = { DECIR_INMEDIATAMENTE };
+module.exports = { MENU };

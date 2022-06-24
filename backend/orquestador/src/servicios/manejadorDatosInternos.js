@@ -196,7 +196,7 @@ class ManejadorDatosInternos {
   };
 
   agregarMensaje = async ({
-    texto,
+    cuerpo,
     origen,
     idCliente,
     idSesion,
@@ -213,7 +213,7 @@ class ManejadorDatosInternos {
       .set({
         fecha: moment.unix(fecha._seconds),
         origen: origen,
-        cuerpo: { estado: 'recibido', texto: texto },
+        cuerpo: cuerpo,
       });
   };
 

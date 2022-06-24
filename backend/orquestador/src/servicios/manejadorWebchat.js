@@ -172,7 +172,7 @@ class ManejadorWebchat {
         if (mensaje) {
           const nuevaSesion = await this.#datosInternos.crearSesion(idCliente);
           await this.#datosInternos.agregarMensaje({
-            texto: mensaje,
+            cuerpo: { estado: 'recibido', texto: mensaje },
             idSesion: nuevaSesion.id,
             idCliente: idCliente,
             origen: 'bot',

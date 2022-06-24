@@ -44,25 +44,9 @@ const CuerpoChat = (props) => {
                 {moment(sesion.fecha).format('DD/MM/YYYY hh:mm:ss A')}
               </Typography>
               {sesion.mensajes.map((mensaje, indice) => {
-                const ultimoMensaje =
-                  ultimaSesion && indice === sesion.mensajes.length - 1
-                    ? true
-                    : false;
                 if (mensaje.origen === 'bot' || mensaje.origen === 'agente') {
-                  if (ultimoMensaje) {
-                    return (
-                      <MensajeRecibido
-                        key={mensaje.id}
-                        negocio={nombreAvatar}
-                        texto={mensaje.cuerpo?.texto}
-                        hora={moment
-                          .unix(mensaje.fecha._seconds)
-                          .format('hh:mm A')}
-                        ultimo={
-                          mensajesBot[mensajesBot.length - 1].id === mensaje.id
-                        }
-                      />
-                    );
+                  if (mensaje.cuerpo?.tipo === 'MENU') {
+                    console.log('MENU');
                   } else {
                     return (
                       <MensajeRecibido
@@ -79,30 +63,16 @@ const CuerpoChat = (props) => {
                     );
                   }
                 } else {
-                  if (ultimoMensaje) {
-                    return (
-                      <MensajeEnviado
-                        key={mensaje.id}
-                        texto={mensaje.cuerpo?.texto}
-                        hora={moment
-                          .unix(mensaje.fecha._seconds)
-                          .format('hh:mm A')}
-                        estado={mensaje.cuerpo?.estado}
-                        ref={refItem}
-                      />
-                    );
-                  } else {
-                    return (
-                      <MensajeEnviado
-                        key={mensaje.id}
-                        texto={mensaje.cuerpo?.texto}
-                        hora={moment
-                          .unix(mensaje.fecha._seconds)
-                          .format('hh:mm A')}
-                        estado={mensaje.cuerpo?.estado}
-                      />
-                    );
-                  }
+                  return (
+                    <MensajeEnviado
+                      key={mensaje.id}
+                      texto={mensaje.cuerpo?.texto}
+                      hora={moment
+                        .unix(mensaje.fecha._seconds)
+                        .format('hh:mm A')}
+                      estado={mensaje.cuerpo?.estado}
+                    />
+                  );
                 }
               })}
               <div ref={refItem}></div>

@@ -42,7 +42,6 @@ class AdministradorConexion {
     });
 
     this.#socket.on('enviadoMensajeEntrante-webchat', (datos) => {
-      //confirmar recepción del mensaje
       const objetoDatos = JSON.parse(datos);
       const { id } = objetoDatos;
       this.#cambiarEstadoMensaje(id, 'enviado');

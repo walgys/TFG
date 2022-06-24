@@ -18,7 +18,7 @@ const PieChat = (props) => {
       idSesion: sesiones[sesiones.length - 1].id,
       idCliente: idCliente,
       idNegocio: idNegocio,
-      texto: textoEnviar,
+      cuerpo: { texto: textoEnviar },
       fecha: { _seconds: moment().unix() },
       origen: 'cliente',
       token: token,
@@ -33,7 +33,7 @@ const PieChat = (props) => {
             id: mensaje.id,
             fecha: mensaje.fecha,
             origen: mensaje.origen,
-            cuerpo: { texto: mensaje.texto, estado: 'esperando' },
+            cuerpo: { ...mensaje.cuerpo, estado: 'esperando' },
           },
         ];
         return { ...sesion, mensajes: mensajes };

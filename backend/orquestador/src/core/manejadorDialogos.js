@@ -36,20 +36,17 @@ class ManejadorDialogos {
 
   #procesarMensaje = async () => {
     const { idSocket, mensaje } = this.#mensaje.datos;
-    const { idCliente, idNegocio, texto } = JSON.parse(mensaje);
-
+    const { idCliente, idNegocio, cuerpo } = JSON.parse(mensaje);
+    const { texto } = cuerpo;
     const datosCliente = await this.#manejadorDatosInternos.buscarCliente({
       idCliente,
     });
 
-    const {
-      topico,
-      intencionEnEjecucion,
-      ultimaRegla,
-      proximaRegla,
-      botActivado,
-      agenteAsignado,
-    } = datosCliente.estadoCliente;
+    const { topico, botActivado, agenteAsignado } = datosCliente.estadoCliente;
+
+    let { intencionEnEjecucion, ultimaRegla, proximaRegla } =
+      datosCliente.estadoCliente;
+
     let mejorIntencion;
 
     if (botActivado) {
@@ -85,16 +82,20 @@ class ManejadorDialogos {
         while (mejorIntencion.reglas.length > indiceReglaAEjecutar) {
           if (intencionEnEjecucion != '') {
             if (proximaRegla !== '') {
+              if (proximaRegla == 'intencionCumplida') {
+                intencionCumplida = true;
+              }
               mejorIntencion.reglas.forEach((regla, indice) => {
                 if (regla.id === proximaRegla) {
                   reglaAEjecutar = regla;
                   indiceReglaAEjecutar = indice;
-                } else {
-                  intencionCumplida = true;
                 }
               });
+              if (!reglaAEjecutar) {
+                intencionCumplida = true;
+              }
             } else {
-              intencionCumplida = true;
+              reglaAEjecutar = mejorIntencion.reglas[0];
             }
           } else if (ultimaRegla === '' && proximaRegla === '') {
             reglaAEjecutar = mejorIntencion.reglas[0];
@@ -112,14 +113,9 @@ class ManejadorDialogos {
                 manejadorDatosInternos: this.#manejadorDatosInternos,
                 servicioColasMensajes: this.#servicioColasMensajes,
                 mensajeEntrante: this.#mensaje,
+                configuracionRegla: reglaAEjecutar.configuracion,
               };
 
-              if (reglaAEjecutar.configuracion.texto) {
-                objetoConfiguracion = {
-                  ...objetoConfiguracion,
-                  texto: reglaAEjecutar.configuracion.texto,
-                };
-              }
               const resultado =
                 reglaEncontrada.ejecutarRegla(objetoConfiguracion);
 
@@ -133,30 +129,38 @@ class ManejadorDialogos {
                     proximaRegla: '',
                   },
                 };
+
+                this.#servicioColasMensajes.agregarMensaje({
+                  topico: 'orquestadorManejadorDialogos',
+                  mensaje: this.#mensaje,
+                });
               } else {
-                if (mejorIntencion.reglas.length - 1 == indiceReglaAEjecutar) {
+                if (mejorIntencion.reglas.length - 1 === indiceReglaAEjecutar) {
                   datosClienteActualizado = {
                     ...datosCliente,
                     estadoCliente: {
                       ...datosCliente.estadoCliente,
                       intencionEnEjecucion: '',
                       ultimaRegla: '',
-                      proximaRegla: '',
+                      proximaRegla: 'intencionCumplida',
                     },
                   };
                 } else {
+                  intencionEnEjecucion = mejorIntencion.id;
+                  ultimaRegla = reglaAEjecutar.id;
+                  proximaRegla =
+                    mejorIntencion.reglas.length - 1 === indiceReglaAEjecutar
+                      ? ''
+                      : mejorIntencion.reglas[indiceReglaAEjecutar + 1].id;
+
                   datosClienteActualizado = {
                     ...datosCliente,
                     estadoCliente: {
                       ...datosCliente.estadoCliente,
-                      intencionEnEjecucion: mejorIntencion.id,
+                      intencionEnEjecucion: intencionEnEjecucion,
                       estadoIntencion: '',
-                      ultimaRegla: reglaAEjecutar.id,
-                      proximaRegla:
-                        mejorIntencion.reglas.length - 1 ===
-                        indiceReglaAEjecutar
-                          ? ''
-                          : mejorIntencion.reglas[indiceReglaAEjecutar + 1].id,
+                      ultimaRegla: ultimaRegla,
+                      proximaRegla: proximaRegla,
                     },
                   };
                 }
@@ -186,8 +190,6 @@ class ManejadorDialogos {
           }
         }
       }
-
-      console.log(mejorIntencion);
     } else if (agenteAsignado !== '') {
       //reenviar a agente los mensajes.
     }
