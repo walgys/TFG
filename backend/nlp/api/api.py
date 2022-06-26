@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 api = Api(app)
 
+
 class BuscarSimilitudHilo(Resource):
     def post(self):
         try:
@@ -28,7 +29,6 @@ def buscarSimilitud(dominios, clienteDice, contexto):
 
     if len(contexto["topico"]) > 0:
         for dominio in dominios:
-
             if dominio["topico"] == contexto["topico"]:
                 for intencion in dominio["intenciones"]:
                     resultados_parciales = []
@@ -47,14 +47,18 @@ def buscarSimilitud(dominios, clienteDice, contexto):
                                 clienteDice.similarity(comparable_Intention)
                             )
                             resultados_parciales.sort(key=lambda x: x, reverse=False)
-                    if len(resultados_parciales) > 0:
-                        resultados.append(
-                            {
-                                "topico": dominio["topico"],
-                                "intention": intencion,
-                                "similarity": resultados_parciales.pop(),
-                            }
-                        )
+                        if len(resultados_parciales) > 0:
+                            resultados.append(
+                                {
+                                    "topico": dominio["topico"],
+                                    "intention": intencion,
+                                    "similarity": resultados_parciales.pop(),
+                                }
+                            )
+        if len(resultados) == 0:
+            resultados.append(
+                {"topico": "", "intention": "NO_ENTIENDE", "similarity": 1}
+            )
         resultados.sort(key=lambda x: x["similarity"], reverse=True)
         return resultados[:5]
     else:
@@ -62,18 +66,32 @@ def buscarSimilitud(dominios, clienteDice, contexto):
             for intencion in dominio["intenciones"]:
                 resultados_parciales = []
                 for disparador in intencion["disparadores"]:
-                    comparable_Intention = core.iniciarPLN(disparador)
-                    resultados_parciales.append(
-                        clienteDice.similarity(comparable_Intention)
-                    )
+                    if disparador == "*":
+                        resultados.append(
+                            {
+                                "topico": dominio["topico"],
+                                "intention": intencion,
+                                "similarity": 1.0,
+                            }
+                        )
+                    else:
+                        comparable_Intention = core.iniciarPLN(disparador)
+                        resultados_parciales.append(
+                            clienteDice.similarity(comparable_Intention)
+                        )
                 resultados_parciales.sort(key=lambda x: x, reverse=False)
-                resultados.append(
-                    {
-                        "topico": dominio["topico"],
-                        "intention": intencion,
-                        "similarity": resultados_parciales.pop(),
-                    }
-                )
+                if len(resultados_parciales) > 0:
+                    resultados.append(
+                        {
+                            "topico": dominio["topico"],
+                            "intention": intencion,
+                            "similarity": resultados_parciales.pop(),
+                        }
+                    )
+        if len(resultados) == 0:
+            resultados.append(
+                {"topico": "", "intention": "NO_ENTIENDE", "similarity": 1}
+            )
         resultados.sort(key=lambda x: x["similarity"], reverse=True)
         return resultados[:5]
 

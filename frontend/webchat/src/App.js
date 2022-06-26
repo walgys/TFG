@@ -41,7 +41,7 @@ function App(props) {
           actualizado: moment().unix(),
         }));
       });
-  }, [estado.idNegocio]);
+  }, [estado.idNegocio, estado.idCanal]);
 
   useEffect(() => {
     if (estado.idCliente != '' && estado.forzarActualizarHistoral) {
@@ -84,7 +84,7 @@ function App(props) {
         idNegocio: estado.idNegocio,
         token: estado.token,
       });
-  }, [estado.idCanal, estado.idNegocio, estado.token]);
+  }, [estado.idCanal, estado.idNegocio, estado.token, estado.idSocket]);
 
   const propiedadesCompartidas = { estado, setEstado, administradorConexion };
 

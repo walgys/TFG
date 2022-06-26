@@ -1,5 +1,6 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 const admin = require('firebase-admin');
 const path = require('path');
 const moment = require('moment');
@@ -7,6 +8,7 @@ const moment = require('moment');
 class ManejadorDatosInternos {
   #firebaseApp;
   #firestoreDB;
+  #firebaseAuth;
   static #instancia;
   constructor() {
     this.#firebaseApp = initializeApp({
@@ -18,6 +20,7 @@ class ManejadorDatosInternos {
       ),
     });
     this.#firestoreDB = getFirestore();
+    this.#firebaseAuth = getAuth();
     console.log('ManejadorDatosInternos');
   }
 
@@ -28,9 +31,56 @@ class ManejadorDatosInternos {
     return this.#instancia;
   }
 
-  obtenerReglas = async () => {
+  verificarToken = async (token) =>
+    await this.#firebaseAuth
+      .verifyIdToken(token)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+  obtenerDominiosEIntenciones = async (uid) => {
+    const usuarioConsola = await this.#firestoreDB
+      .collection('usuariosConsola')
+      .doc(uid)
+      .get();
+
+    const { negocio } = usuarioConsola.data();
+    const dominios = await this.buscarDominios(negocio);
+    const intenciones = await this.buscarIntenciones(negocio);
+    const intencionesExpandidas = await intenciones.docs.map((intencion) => ({
+      id: intencion.id,
+      ...intencion.data(),
+    }));
+
+    const dominiosEIntenciones = await Promise.all(
+      dominios.docs.map((dominio) => {
+        const intencionesPorDominio = intencionesExpandidas.filter(
+          (intencion) => intencion.dominio == dominio.id
+        );
+
+        return {
+          id: dominio.id,
+          ...dominio.data(),
+          intenciones: intencionesPorDominio,
+        };
+      })
+    );
+    return { dominiosEIntenciones: dominiosEIntenciones, negocio: negocio };
+  };
+
+  buscarReglas = async () => {
     return await this.#firestoreDB
       .collection('reglas_esquema')
+      .where('negocio', '==', idNegocio)
+      .get();
+  };
+
+  buscarDominios = async (idNegocio) => {
+    return await this.#firestoreDB
+      .collection('dominios')
       .where('negocio', '==', idNegocio)
       .get();
   };
@@ -102,7 +152,7 @@ class ManejadorDatosInternos {
         ultimaRegla: '',
         proximaRegla: '',
         botActivado: true,
-        topico: 'inicio',
+        topico: '',
         variablesCliente: {
           nombre: '',
           valor: '',

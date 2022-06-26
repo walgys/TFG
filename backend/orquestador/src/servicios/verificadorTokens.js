@@ -21,6 +21,14 @@ class VerificadorTokens {
     return this.#instancia;
   }
 
+  verificarTokenFB = (token) => {
+    try {
+      return jwt.decode(token);
+    } catch (err) {
+      return { error: err };
+    }
+  };
+
   verificarTokenPlataforma = (token) => {
     try {
       return jwt.verify(token, this.#secret);
@@ -29,8 +37,6 @@ class VerificadorTokens {
     }
   };
 
-  verificarTokenFirestore = () => {};
-
   generarTokenWebchat = ({ idNegocio, idCanal, idCliente }) => {
     return jwt.sign(
       { idNegocio: idNegocio, idCanal: idCanal, idCliente: idCliente },
@@ -38,6 +44,12 @@ class VerificadorTokens {
       { expiresIn: '7d' }
     );
     //generear jwt para el webchat
+  };
+
+  generarTokenConsola = ({ negocio, uid }) => {
+    return jwt.sign({ idNegocio: negocio, uid: uid }, this.#secret, {
+      expiresIn: '7d',
+    });
   };
 
   buscarEstadoCuenta = () => {};

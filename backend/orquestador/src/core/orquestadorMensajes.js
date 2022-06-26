@@ -97,7 +97,9 @@ class OrquestadorMensajes {
   terminar = async ({ uuid, resultado }) => {
     console.log('termino ', uuid);
     console.log('resultado: ', resultado);
-    this.#colaMD = await this.#colaMD.filter((MD) => MD.uuid !== uuid);
+    const newCola = await this.#colaMD.filter((MD) => MD.uuid == uuid);
+    this.#colaMD = [...newCola];
+    console.log(this.#colaMD);
   };
 }
 

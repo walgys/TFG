@@ -31,7 +31,6 @@ class AdministradorConexion {
     this.#setEstado((prevState) => ({
       ...prevState,
       idSocket: this.#socket.id,
-      forzarActualizarHistoral: true,
     }));
 
     this.#socket.on('reconexion-webchat', () => {

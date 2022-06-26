@@ -27,7 +27,26 @@ class ApiConsola {
   procesarMensajeWebsocket = (client) => {
     console.log('someone connected');
 
-    client.on('mensajeConsolaEntrante', (data) => {
+    client.on('obtenerDominiosEIntenciones', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+      if (uid) {
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            negocio: negocio,
+          })
+        );
+      }
+    });
+
+    client.on('obtenerIntenciones', (data) => {
       const parsedData = JSON.parse(data);
       console.log(`event: mensajeConsolaEntrante, data: ${data}`);
       client.emit(

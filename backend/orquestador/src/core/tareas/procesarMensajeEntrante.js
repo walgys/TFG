@@ -153,7 +153,7 @@ async function procesarBuscarHistorialConversacion(datos) {
       if (mensaje) {
         const nuevaSesion = await manejadorDatosInternos.crearSesion(idCliente);
         await manejadorDatosInternos.agregarMensaje({
-          texto: mensaje,
+          cuerpo: { texto: mensaje, estado: 'recibido' },
           idSesion: nuevaSesion.id,
           idCliente: idCliente,
           id: id,

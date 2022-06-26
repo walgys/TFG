@@ -8,7 +8,7 @@ class MENU {
     mensajeEntrante,
     manejadorDatosInternos,
   }) => {
-    const { opciones, titulo } = configuracionRegla;
+    const { opciones, titulo, encabezado } = configuracionRegla;
     const { idSocket, mensaje } = mensajeEntrante.datos;
     const { idCliente, idSesion } = JSON.parse(mensaje);
 
@@ -17,6 +17,7 @@ class MENU {
         tipo: 'MENU',
         opciones: opciones,
         titulo: titulo,
+        encabezado: encabezado ? encabezado : '',
         estado: 'recibido',
       },
       origen: 'bot',

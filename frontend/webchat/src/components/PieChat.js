@@ -13,6 +13,7 @@ const PieChat = (props) => {
   const { sesiones, token, idCliente, idSocket, idNegocio } = estado;
 
   const enviarMensaje = () => {
+    if (textoEnviar == '') return;
     const mensaje = {
       idSocket: idSocket,
       idSesion: sesiones[sesiones.length - 1].id,

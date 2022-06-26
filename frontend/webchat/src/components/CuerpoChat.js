@@ -4,9 +4,10 @@ import { createRef, useEffect, useRef } from 'react';
 import './cuerpoChat.scss';
 import MensajeEnviado from './MensajeEnviado';
 import MensajeRecibido from './MensajeRecibido';
+import Menu from './Menu';
 
 const CuerpoChat = (props) => {
-  const { estado } = props;
+  const { estado, setEstado, administradorConexion } = props;
   const { sesiones } = estado;
   const nombreAvatar = 'Tiendy';
   const refItem = createRef();
@@ -46,12 +47,29 @@ const CuerpoChat = (props) => {
               {sesion.mensajes.map((mensaje, indice) => {
                 if (mensaje.origen === 'bot' || mensaje.origen === 'agente') {
                   if (mensaje.cuerpo?.tipo === 'MENU') {
-                    console.log('MENU');
+                    return (
+                      <Menu
+                        key={mensaje.id}
+                        nombreAvatar={nombreAvatar}
+                        titulo={mensaje.cuerpo?.titulo}
+                        encabezado={mensaje.cuerpo?.encabezado}
+                        opciones={mensaje.cuerpo?.opciones}
+                        estado={estado}
+                        setEstado={setEstado}
+                        administradorConexion={administradorConexion}
+                        hora={moment
+                          .unix(mensaje.fecha._seconds)
+                          .format('hh:mm A')}
+                        ultimo={
+                          mensajesBot[mensajesBot.length - 1].id === mensaje.id
+                        }
+                      />
+                    );
                   } else {
                     return (
                       <MensajeRecibido
                         key={mensaje.id}
-                        negocio={nombreAvatar}
+                        nombreAvatar={nombreAvatar}
                         texto={mensaje.cuerpo?.texto}
                         hora={moment
                           .unix(mensaje.fecha._seconds)

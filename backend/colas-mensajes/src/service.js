@@ -23,6 +23,7 @@ io.on('connection', (client) => {
 
     cola.ponerEnCola(mensaje);
     colas.push({ topico: topico, cola: cola });
+    console.log(mensaje);
     client.emit('respuestaAgregarMensaje', mensaje);
   });
 
