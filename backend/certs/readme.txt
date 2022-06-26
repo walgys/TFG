@@ -1,0 +1,1 @@
+Aqui van las credenciales para conexion con los servicios de Firebase y secreto de jwt
