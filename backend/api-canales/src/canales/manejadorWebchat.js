@@ -8,7 +8,6 @@ class ManejadorWebchat {
   #manejadorColasMensajes;
   #websocket;
   #colaMensajesSalientes = [];
-  #clienteWS;
 
   constructor() {
     this.#websocket = new io.Server(9000, {

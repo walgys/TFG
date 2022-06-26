@@ -2,12 +2,12 @@ const ioClient = require('socket.io-client');
 
 class ServicioColasMensajes {
   static #instancia;
-  #serverAddr;
+  #direccionServidor;
   #socket;
   #callbacks = [];
   constructor() {
-    this.#serverAddr = 'http://localhost:4000';
-    this.#socket = ioClient(this.#serverAddr, {
+    this.#direccionServidor = 'http://localhost:4000';
+    this.#socket = ioClient(this.#direccionServidor, {
       path: '/',
     });
     this.#socket.on('connect', this.#procesarMensajeWebsocket);

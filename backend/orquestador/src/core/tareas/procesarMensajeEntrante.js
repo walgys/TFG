@@ -179,8 +179,7 @@ async function procesarBuscarHistorialConversacion(datos) {
   }
   return 'procesarBuscarHistorialConversacion';
 }
-// Main thread will pass the data you need
-// through this event listener.
+
 parentPort.on('message', async (params) => {
   const { datos, endpoint } = params;
   const accion = endpoints[endpoint];
@@ -189,8 +188,5 @@ parentPort.on('message', async (params) => {
     result = await accion(datos);
   }
 
-  // Access the workerData.
-
-  // return the result to main thread.
   parentPort.postMessage(result);
 });

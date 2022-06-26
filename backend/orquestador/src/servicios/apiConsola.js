@@ -4,7 +4,7 @@ class ApiConsola {
   #datosInternos;
   #verificadorTokens;
   constructor() {
-    this.websocket = new io.Server(8000, {
+    this.socket = new io.Server(8000, {
       cors: {
         origin: '*',
       },
@@ -21,7 +21,7 @@ class ApiConsola {
   configurar = (datosInternos, verificadorTokens) => {
     this.#datosInternos = datosInternos;
     this.#verificadorTokens = verificadorTokens;
-    this.websocket.on('connection', this.procesarMensajeWebsocket);
+    this.socket.on('connection', this.procesarMensajeWebsocket);
   };
 
   procesarMensajeWebsocket = (client) => {

@@ -1,6 +1,6 @@
 const server = require('http').createServer();
 const { Cola } = require('./cola');
-const io = require('socket.io')(server, {
+const socket = require('socket.io')(server, {
   cors: {
     origin: '*',
   },
@@ -8,7 +8,7 @@ const io = require('socket.io')(server, {
 });
 const colas = [];
 
-io.on('connection', (client) => {
+socket.on('connection', (client) => {
   console.log('someone connected');
 
   client.on('agregarMensaje', (datos) => {

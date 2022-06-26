@@ -3,7 +3,6 @@ const { ManejadorDialogos } = require('./manejadorDialogos');
 class OrquestadorMensajes {
   static #instancia;
   #servicioColasMensajes;
-  #administradorEntidades;
   #manejadorDatosExternos;
   #manejadorDatosInternos;
   #servicioPLN;
@@ -31,7 +30,6 @@ class OrquestadorMensajes {
 
   configurar = ({
     servicioColasMensajes,
-    administradorEntidades,
     manejadorDatosExternos,
     manejadorDatosInternos,
     servicioPLN,
@@ -39,7 +37,6 @@ class OrquestadorMensajes {
     administradorReglas,
   }) => {
     this.#servicioColasMensajes = servicioColasMensajes;
-    this.#administradorEntidades = administradorEntidades;
     this.#manejadorDatosExternos = manejadorDatosExternos;
     this.#manejadorDatosInternos = manejadorDatosInternos;
     this.#administradorReglas = administradorReglas;
@@ -79,7 +76,6 @@ class OrquestadorMensajes {
       ) {
         const uuid = uuidv4();
         const manejadorMD = new ManejadorDialogos({
-          administradoEntidades: this.#administradorEntidades,
           administradorDatosExternos: this.#manejadorDatosExternos,
           manejadorDatosInternos: this.#manejadorDatosInternos,
           servicioPLN: this.#servicioPLN,

@@ -2,7 +2,6 @@ const { ManejadorServicios } = require('./servicios/manejadorServicios');
 
 const main = async () => {
   const manejadorServicios = ManejadorServicios.getInstancia();
-  const manejadorWebchat = manejadorServicios.servicios.manejadorWebchat;
 
   /*let id = 1;
   setInterval(() => servicioColasMensajes.obtenerMensaje(), 1000);

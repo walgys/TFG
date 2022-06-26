@@ -2,9 +2,9 @@ const axios = require('axios');
 
 class ServicioPLN {
   static #instancia;
-  #config;
+  #configuracion;
   constructor() {
-    this.#config = {
+    this.#configuracion = {
       method: 'POST',
       url: 'http://localhost:5000/',
       headers: {
@@ -23,8 +23,8 @@ class ServicioPLN {
   buscarSimilitud = async (data) => {
     try {
       const newConfig = {
-        ...this.#config,
-        url: this.#config.url + 'buscarSimilitud',
+        ...this.#configuracion,
+        url: this.#configuracion.url + 'buscarSimilitud',
         data: JSON.stringify(data),
       };
       const res = await axios(newConfig);

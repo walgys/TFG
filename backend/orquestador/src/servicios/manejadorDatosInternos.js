@@ -1,6 +1,5 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const { getAuth } = require('firebase-admin/auth');
 const admin = require('firebase-admin');
 const path = require('path');
 const moment = require('moment');
@@ -8,7 +7,6 @@ const moment = require('moment');
 class ManejadorDatosInternos {
   #firebaseApp;
   #firestoreDB;
-  #firebaseAuth;
   static #instancia;
   constructor() {
     this.#firebaseApp = initializeApp({
@@ -20,7 +18,6 @@ class ManejadorDatosInternos {
       ),
     });
     this.#firestoreDB = getFirestore();
-    this.#firebaseAuth = getAuth();
     console.log('ManejadorDatosInternos');
   }
 
@@ -31,19 +28,9 @@ class ManejadorDatosInternos {
     return this.#instancia;
   }
 
-  verificarToken = async (token) =>
-    await this.#firebaseAuth
-      .verifyIdToken(token)
-      .then((decodedToken) => {
-        const uid = decodedToken.uid;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
   obtenerDominiosEIntenciones = async (uid) => {
     const usuarioConsola = await this.#firestoreDB
-      .collection('usuariosConsola')
+      .collection('agentes')
       .doc(uid)
       .get();
 
@@ -277,8 +264,6 @@ class ManejadorDatosInternos {
 
     return sesion;
   };
-
-  verificarToken = async (token) => admin.auth().verifyIdToken(token);
 }
 
 module.exports = { ManejadorDatosInternos };

@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import Ingreso from './paginas/Ingreso';
 import Intenciones from './paginas/Intenciones';
-import ProveedorAutenticacion from './componentes/ProveedorAutenticacion';
+import ProveedorAutenticacion from './servicios/ProveedorAutenticacion';
 import './App.css';
 import React, { useEffect } from 'react';
 import { useCookies } from 'react-cookie';

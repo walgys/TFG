@@ -4,13 +4,13 @@ const path = require('path');
 
 class VerificadorTokens {
   static #instancia;
-  #secret;
+  #secreto;
   constructor() {
-    const rawdata = fs.readFileSync(
+    const datosLeidos = fs.readFileSync(
       path.resolve(__dirname, '../../../certs/jwt.json')
     );
-    const data = JSON.parse(rawdata);
-    this.#secret = data.secret;
+    const datos = JSON.parse(datosLeidos);
+    this.#secreto = datos.secret;
     console.log('VerificadorTokens');
   }
 
@@ -31,7 +31,7 @@ class VerificadorTokens {
 
   verificarTokenPlataforma = (token) => {
     try {
-      return jwt.verify(token, this.#secret);
+      return jwt.verify(token, this.#secreto);
     } catch (err) {
       return { error: err };
     }
@@ -40,22 +40,17 @@ class VerificadorTokens {
   generarTokenWebchat = ({ idNegocio, idCanal, idCliente }) => {
     return jwt.sign(
       { idNegocio: idNegocio, idCanal: idCanal, idCliente: idCliente },
-      this.#secret,
+      this.#secreto,
       { expiresIn: '7d' }
     );
     //generear jwt para el webchat
   };
 
   generarTokenConsola = ({ negocio, uid }) => {
-    return jwt.sign({ idNegocio: negocio, uid: uid }, this.#secret, {
+    return jwt.sign({ idNegocio: negocio, uid: uid }, this.#secreto, {
       expiresIn: '7d',
     });
   };
-
-  buscarEstadoCuenta = () => {};
-
-  crearPedido = () => {};
-  crearConsulta = () => {};
 }
 
 module.exports = { VerificadorTokens };

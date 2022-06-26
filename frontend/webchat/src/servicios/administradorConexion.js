@@ -4,13 +4,13 @@ const ioClient = require('socket.io-client');
 
 class AdministradorConexion {
   static #instancia;
-  #serverAddr;
+  #direccionServidor;
   #socket;
   #setEstado;
   #setCookie;
   constructor() {
-    this.#serverAddr = 'http://localhost:9000';
-    this.#socket = ioClient.connect(this.#serverAddr);
+    this.#direccionServidor = 'http://localhost:9000';
+    this.#socket = ioClient.connect(this.#direccionServidor);
     this.#socket.on('connect', this.#procesarMensajeWebsocket);
   }
 
@@ -27,7 +27,7 @@ class AdministradorConexion {
   };
 
   #procesarMensajeWebsocket = (clienteWS) => {
-    console.log(`connected to ${this.#serverAddr}`);
+    console.log(`connected to ${this.#direccionServidor}`);
     this.#setEstado((prevState) => ({
       ...prevState,
       idSocket: this.#socket.id,
