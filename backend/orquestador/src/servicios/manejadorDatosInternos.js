@@ -58,11 +58,12 @@ class ManejadorDatosInternos {
     return { dominiosEIntenciones: dominiosEIntenciones, negocio: negocio };
   };
 
-  buscarReglas = async () => {
-    return await this.#firestoreDB
+  buscarReglasEsquema = async () => {
+    const reglas = await this.#firestoreDB
       .collection('reglas_esquema')
-      .where('negocio', '==', idNegocio)
       .get();
+      
+      return reglas.docs.map(regla=>({ id: regla.id, ...regla.data() }));
   };
 
   buscarDominios = async (idNegocio) => {

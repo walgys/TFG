@@ -55,6 +55,20 @@ class ApiConsola {
       );
     });
 
+    client.on('obtenerReglasEsquema', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+      if (uid) {
+      
+        const reglasEsquema = await this.#datosInternos.buscarReglasEsquema();
+
+        client.emit('respuestaObtenerReglasEsquema', JSON.stringify({ reglasEsquema: reglasEsquema }));
+      }
+    })
+
     client.on('heartbeat', () => {
       console.log('heartbeat');
       client.emit('heartbeat', '');

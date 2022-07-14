@@ -68,8 +68,9 @@ function App() {
   const [estado, setEstado] = useState({
     usuario: {
       token: '',
-      email: '',
+      email: ''
     },
+    claveIntenciones: 1,
   });
   const administradorConexion = AdministradorConexion.getInstancia(setEstado);
   const [cookies, setCookie, removeCookie] = useCookies([
@@ -88,10 +89,6 @@ function App() {
     }));
   }, [cookies]);
 
-  useEffect(() => {
-    console.log(estado);
-  }, []);
-
   return (
     <AppContext.Provider
       value={{
@@ -100,7 +97,7 @@ function App() {
         token: estado.usuario.token,
         setCookie,
         cookies,
-        setEstado,
+        setEstado
       }}
     >
       <AuthProvider>
@@ -114,7 +111,7 @@ function App() {
                 path="/Intenciones"
                 element={
                   <RequireAuth>
-                    <Intenciones authContext={AuthContext} />
+                    <Intenciones />
                   </RequireAuth>
                 }
               />

@@ -24,11 +24,11 @@ import ModalPropiedades from '../componentes/ModalPropiedades';
 
 const Intenciones = (props) => {
   const { estado, administradorConexion } = useContext(AppContext);
-  const { usuario, dominiosEIntenciones } = estado;
+  const { usuario, dominiosEIntenciones, reglasEsquema } = estado;
   const [intencionEdicion, setIntencionEdicion] = useState();
   const [configuracion, setConfiguracion] = useState([]);
   const [estadoModal, setEstadoModal] = useState(false);
-  const [propiedadModal, setPropiedadModal] = useState({});
+  const [parametrosModal, setParametrosModal] = useState({});
   const propiedadesInmutables = [
     'id',
     'intencion',
@@ -49,25 +49,33 @@ const Intenciones = (props) => {
       setConfiguracion(configuracion);
     }
   }, [intencionEdicion]);
+  
 
   const obtenerDominiosCallback = useCallback(
-    () =>
+    (token) => {
       administradorConexion.obtenerDominiosEIntenciones({
-        token: usuario.token,
-      }),
+        token: token,
+      });
+      administradorConexion.obtenerReglasEsquema({
+        token: token,
+      });
+    },
     []
   );
 
   useEffect(() => {
-    obtenerDominiosCallback();
-  }, []);
-
+    if (usuario.token !== '') {
+      obtenerDominiosCallback(usuario.token);
+    }
+    
+  }, [usuario.token]);
+  
   const enviarMensajeHandler = () => {
     console.log('aprete');
   };
 
-  const cambiarEstadoModal = (propiedad) => {
-    setPropiedadModal(propiedad);
+  const cambiarEstadoModal = (parametros) => {
+    setParametrosModal(parametros);
     setEstadoModal(!estadoModal);
   };
 
@@ -86,7 +94,7 @@ const Intenciones = (props) => {
             flexDirection: 'column',
           }}
         >
-          <Paper style={{ height: '100%', padding: '10px' }}>
+          <Paper style={{ height: '100%', padding: '10px' }} elevation={2}>
             <Typography variant="h4" align={'center'}>
               Dominios
             </Typography>
@@ -94,7 +102,10 @@ const Intenciones = (props) => {
             <List>
               {dominiosEIntenciones?.map((dominio) => (
                 <ListItem sx={{ justifyContent: 'center' }} key={dominio?.id}>
-                  <Accordion sx={{ minWidth: '300px', width: '100%' }}>
+                  <Accordion
+                    sx={{ minWidth: '300px', width: '100%' }}
+                    elevation={2}
+                  >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1a-content"
@@ -105,12 +116,16 @@ const Intenciones = (props) => {
                     <AccordionDetails>
                       <List>
                         {dominio?.intenciones?.map((intencion) => (
-                          <ListItemButton
-                            key={intencion.id}
-                            onClick={() => setIntencionEdicion(intencion)}
-                          >
-                            <Typography>{intencion?.intencion}</Typography>
-                          </ListItemButton>
+                          <ListItem key={intencion.id}>
+                            <ListItemButton
+                              onClick={() => setIntencionEdicion(intencion)}
+                            >
+                              <Typography>{intencion?.intencion}</Typography>
+                            </ListItemButton>
+                            <IconButton>
+                              <RemoveIcon sx={{ color: 'red' }} />
+                            </IconButton>
+                          </ListItem>
                         ))}
                       </List>
                     </AccordionDetails>
@@ -118,7 +133,10 @@ const Intenciones = (props) => {
                 </ListItem>
               ))}
               <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
-                <IconButton sx={{ backgroundColor: colors.blue[400] }}>
+                <IconButton
+                  sx={{ backgroundColor: colors.blue[400] }}
+                  onClick={() => cambiarEstadoModal({ tipo: 'nuevoDominio' })}
+                >
                   <AddIcon
                     sx={{
                       color: colors.common.white,
@@ -137,14 +155,17 @@ const Intenciones = (props) => {
             flexDirection: 'column',
           }}
         >
-          <Paper style={{ height: '100%', padding: '10px' }}>
+          <Paper style={{ height: '100%', padding: '10px' }} elevation={2}>
             {intencionEdicion && (
               <List>
                 <Typography variant="h5" align={'center'}>
                   {intencionEdicion.intencion}
                 </Typography>
                 <ListItem sx={{ justifyContent: 'center' }}>
-                  <Accordion sx={{ minWidth: '300px', width: '100%' }}>
+                  <Accordion
+                    sx={{ minWidth: '300px', width: '100%' }}
+                    elevation={2}
+                  >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1a-content"
@@ -199,25 +220,37 @@ const Intenciones = (props) => {
                     <AccordionDetails>
                       <List>
                         {intencionEdicion?.reglas?.map((regla) => (
-                          <ListItemButton
-                            key={regla.id}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                            onClick={() => cambiarEstadoModal(regla)}
-                          >
-                            <Typography>{regla.tipo}</Typography>
+                          <ListItem key={regla.id}>
+                            <ListItemButton
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                              onClick={() =>
+                                cambiarEstadoModal({
+                                  propiedades: regla,
+                                  tipo: 'regla',
+                                })
+                              }
+                            >
+                              <Typography>{regla.tipo}</Typography>
+                            </ListItemButton>
                             <IconButton>
                               <RemoveIcon sx={{ color: 'red' }} />
                             </IconButton>
-                          </ListItemButton>
+                          </ListItem>
                         ))}
                         <ListItem
                           sx={{ display: 'flex', justifyContent: 'center' }}
                         >
                           <IconButton
                             sx={{ backgroundColor: colors.blue[400] }}
+                            onClick={() =>
+                              cambiarEstadoModal({
+                                tipo: 'nuevaRegla',
+                                propiedades: reglasEsquema
+                              })
+                            }
                           >
                             <AddIcon
                               sx={{
@@ -242,25 +275,36 @@ const Intenciones = (props) => {
                     <AccordionDetails>
                       <List>
                         {configuracion?.map((propiedad) => (
-                          <ListItemButton
-                            key={propiedad.llave}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                            onClick={() => console.log(propiedad.valor)}
-                          >
-                            <Typography>{propiedad.llave}</Typography>
+                          <ListItem key={propiedad.llave}>
+                            <ListItemButton
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                              onClick={() =>
+                                cambiarEstadoModal({
+                                  propiedades: propiedad,
+                                  tipo: 'propiedadUnica',
+                                })
+                              }
+                            >
+                              <Typography>{propiedad.llave}</Typography>
+                            </ListItemButton>
                             <IconButton>
                               <RemoveIcon sx={{ color: 'red' }} />
                             </IconButton>
-                          </ListItemButton>
+                          </ListItem>
                         ))}
                         <ListItem
                           sx={{ display: 'flex', justifyContent: 'center' }}
                         >
                           <IconButton
                             sx={{ backgroundColor: colors.blue[400] }}
+                            onClick={() =>
+                              cambiarEstadoModal({
+                                tipo: 'nuevoParametroConfiguracion',
+                              })
+                            }
                           >
                             <AddIcon
                               sx={{
@@ -281,7 +325,7 @@ const Intenciones = (props) => {
       <ModalPropiedades
         estadoModal={estadoModal}
         cerrar={cerrar}
-        propiedadModal={propiedadModal}
+        {...parametrosModal}
       />
     </Paper>
   );

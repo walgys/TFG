@@ -25,6 +25,11 @@ class AdministradorConexion {
       this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
     });
 
+    this.socket.on('respuestaObtenerReglasEsquema', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
+    });
+
     this.socket.on('heartbeat', () => {
       console.log('heartbeat');
     });
@@ -34,17 +39,15 @@ class AdministradorConexion {
     this.socket.emit('obtenerDominiosEIntenciones', JSON.stringify(mensaje));
   };
 
-  modificarIntencion = () => {
+  modificarIntencion = () => {};
 
-  }
+  obtenerReglasEsquema = (mensaje) => {
+    this.socket.emit('obtenerReglasEsquema', JSON.stringify(mensaje));
+  };
 
-  crearIntencion = () => {
-    
-  }
+  crearIntencion = () => {};
 
-  crearDominio = () => {
-    
-  }
+  crearDominio = () => {};
 
   enviarMensaje = (mensaje) => {
     console.log('me apretaste');
