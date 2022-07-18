@@ -30,6 +30,11 @@ class AdministradorConexion {
       this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
     });
 
+    this.socket.on('respuestaCrearDominio', (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
+    });
+
     this.socket.on('heartbeat', () => {
       console.log('heartbeat');
     });
@@ -47,10 +52,16 @@ class AdministradorConexion {
 
   crearIntencion = () => {};
 
-  crearDominio = () => {};
+  crearDominio = (mensaje) => {
+    this.socket.emit('crearDominio', JSON.stringify(mensaje));
+  };
+
+  eliminarDominio = (mensaje) => {
+    this.socket.emit('eliminarDominio', JSON.stringify(mensaje));
+  };
 
   enviarMensaje = (mensaje) => {
-    console.log('me apretaste');
+    
     this.socket.emit('mensajeConsolaEntrante', JSON.stringify(mensaje));
   };
 
@@ -59,7 +70,6 @@ class AdministradorConexion {
   };
 
   heartbeat = () => {
-    console.log('emait');
     this.socket.emit('heartbeat', '');
   };
 }

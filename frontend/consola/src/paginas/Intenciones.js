@@ -17,6 +17,7 @@ import {
 import RemoveIcon from '@mui/icons-material/Remove';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { AppContext } from '../utilitarios/contextos';
 import { useCallback } from 'react';
 import { useState } from 'react';
@@ -25,6 +26,7 @@ import ModalPropiedades from '../componentes/ModalPropiedades';
 const Intenciones = (props) => {
   const { estado, administradorConexion } = useContext(AppContext);
   const { usuario, dominiosEIntenciones, reglasEsquema } = estado;
+  const { token } = usuario;
   const [intencionEdicion, setIntencionEdicion] = useState();
   const [configuracion, setConfiguracion] = useState([]);
   const [estadoModal, setEstadoModal] = useState(false);
@@ -49,27 +51,22 @@ const Intenciones = (props) => {
       setConfiguracion(configuracion);
     }
   }, [intencionEdicion]);
-  
 
-  const obtenerDominiosCallback = useCallback(
-    (token) => {
-      administradorConexion.obtenerDominiosEIntenciones({
-        token: token,
-      });
-      administradorConexion.obtenerReglasEsquema({
-        token: token,
-      });
-    },
-    []
-  );
+  const obtenerDominiosCallback = useCallback((token) => {
+    administradorConexion.obtenerDominiosEIntenciones({
+      token: token,
+    });
+    administradorConexion.obtenerReglasEsquema({
+      token: token,
+    });
+  }, []);
 
   useEffect(() => {
     if (usuario.token !== '') {
       obtenerDominiosCallback(usuario.token);
     }
-    
   }, [usuario.token]);
-  
+
   const enviarMensajeHandler = () => {
     console.log('aprete');
   };
@@ -82,6 +79,15 @@ const Intenciones = (props) => {
   const cerrar = () => {
     setEstadoModal(false);
   };
+
+  const crearDominio = (dominio) => {
+    administradorConexion.crearDominio({ token, dominio });
+  };
+
+  const eliminarDominio = (dominio) => {
+    administradorConexion.eliminarDominio({ token, dominio });
+  };
+
 
   return (
     <Paper>
@@ -111,7 +117,24 @@ const Intenciones = (props) => {
                       aria-controls="panel1a-content"
                       id="panel1a-header"
                     >
-                      <Typography>{dominio?.topico}</Typography>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
+                        <Typography>{dominio?.topico}</Typography>
+                        <IconButton aria-label="delete" onClick={() =>
+                    cambiarEstadoModal({
+                      tipo: 'eliminarDominio',
+                      aceptar: eliminarDominio,
+                      propiedades: {id: dominio.id, topico: dominio.topico}
+                    })}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
                     </AccordionSummary>
                     <AccordionDetails>
                       <List>
@@ -127,6 +150,22 @@ const Intenciones = (props) => {
                             </IconButton>
                           </ListItem>
                         ))}
+                        <ListItem
+                          sx={{ display: 'flex', justifyContent: 'center' }}
+                        >
+                          <IconButton
+                            sx={{ backgroundColor: colors.blue[400] }}
+                            onClick={() =>
+                              cambiarEstadoModal({ tipo: 'nuevaIntencion' })
+                            }
+                          >
+                            <AddIcon
+                              sx={{
+                                color: colors.common.white,
+                              }}
+                            />
+                          </IconButton>
+                        </ListItem>
                       </List>
                     </AccordionDetails>
                   </Accordion>
@@ -135,7 +174,12 @@ const Intenciones = (props) => {
               <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
                 <IconButton
                   sx={{ backgroundColor: colors.blue[400] }}
-                  onClick={() => cambiarEstadoModal({ tipo: 'nuevoDominio' })}
+                  onClick={() =>
+                    cambiarEstadoModal({
+                      tipo: 'nuevoDominio',
+                      aceptar: crearDominio,
+                    })
+                  }
                 >
                   <AddIcon
                     sx={{
@@ -196,6 +240,11 @@ const Intenciones = (props) => {
                         >
                           <IconButton
                             sx={{ backgroundColor: colors.blue[400] }}
+                            onClick={() =>
+                              cambiarEstadoModal({
+                                tipo: 'nuevoDisparador',
+                              })
+                            }
                           >
                             <AddIcon
                               sx={{
@@ -248,7 +297,7 @@ const Intenciones = (props) => {
                             onClick={() =>
                               cambiarEstadoModal({
                                 tipo: 'nuevaRegla',
-                                propiedades: reglasEsquema
+                                propiedades: reglasEsquema,
                               })
                             }
                           >

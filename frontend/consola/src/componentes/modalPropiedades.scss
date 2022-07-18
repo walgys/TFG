@@ -1,0 +1,9 @@
+.cuerpo-modal{
+    overflow: auto;
+    max-Height: 80vh;
+    padding: 10px;
+}
+
+.cuerpo-modal::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+}

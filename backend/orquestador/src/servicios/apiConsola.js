@@ -62,10 +62,55 @@ class ApiConsola {
       );
       const uid = decodificado?.user_id;
       if (uid) {
-      
         const reglasEsquema = await this.#datosInternos.buscarReglasEsquema();
 
         client.emit('respuestaObtenerReglasEsquema', JSON.stringify({ reglasEsquema: reglasEsquema }));
+      }
+    })
+
+    client.on('crearDominio', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        const nuevoDominio = await this.#datosInternos.crearDominio({uid, topico: objetoDatos.dominio});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            negocio: negocio,
+          })
+        );
+
+      }
+    })
+
+    client.on('eliminarDominio', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        const nuevoDominio = await this.#datosInternos.eliminarDominio({uid, idDominio: objetoDatos.dominio});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            negocio: negocio,
+          })
+        );
+
       }
     })
 

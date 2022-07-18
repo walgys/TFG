@@ -28,6 +28,8 @@ class ManejadorDatosInternos {
     return this.#instancia;
   }
 
+  //Búsquedas
+
   obtenerDominiosEIntenciones = async (uid) => {
     const usuarioConsola = await this.#firestoreDB
       .collection('agentes')
@@ -126,65 +128,6 @@ class ManejadorDatosInternos {
       .get();
   };
 
-  grabarRegla = () => {};
-
-  grabarNegocio = () => {};
-
-  grabarCliente = () => {};
-
-  crearCliente = async ({ idNegocio, idCanal }) => {
-    const estructuraBasica = {
-      estadoCliente: {
-        estadoUltimaRegla: '',
-        intencionEnEjecucion: '',
-        ultimaRegla: '',
-        proximaRegla: '',
-        botActivado: true,
-        topico: '',
-        variablesCliente: {
-          nombre: '',
-          valor: '',
-        },
-      },
-      fecha: moment(),
-    };
-
-    const idCliente = await this.#firestoreDB
-      .collection('clientes')
-      .add({ ...estructuraBasica, canal: idCanal, negocio: idNegocio });
-    return idCliente.id;
-  };
-
-  actualizarDatosCliente = async (datosClienteActualizado, idCliente) => {
-    await this.#firestoreDB
-      .collection('clientes')
-      .doc(idCliente)
-      .update(datosClienteActualizado);
-  };
-
-  crearSesion = async (idCliente) => {
-    const sesion = await this.#firestoreDB
-      .collection('clientes')
-      .doc(idCliente)
-      .collection('sesiones')
-      .add({ fecha: moment() });
-    return sesion;
-  };
-
-  grabarIntencion = () => {};
-
-  grabarCanal = () => {};
-
-  eliminarRegla = () => {};
-
-  eliminarNegocio = () => {};
-
-  eliminarIntencion = () => {};
-
-  eliminarCliente = () => {};
-
-  eliminarCanal = () => {};
-
   buscarHistorialConversacion = async (
     idCliente,
     fechaInicio = moment().subtract(1, 'months'),
@@ -233,6 +176,26 @@ class ManejadorDatosInternos {
     return;
   };
 
+  buscarSesion = async ({ idSesion, idCliente }) => {
+    const sesion = await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .collection('sesiones')
+      .doc(idSesion)
+      .get();
+
+    return sesion;
+  };
+
+  //Modificaciones
+  
+  actualizarDatosCliente = async (datosClienteActualizado, idCliente) => {
+    await this.#firestoreDB
+      .collection('clientes')
+      .doc(idCliente)
+      .update(datosClienteActualizado);
+  };
+  
   agregarMensaje = async ({
     cuerpo,
     origen,
@@ -255,16 +218,88 @@ class ManejadorDatosInternos {
       });
   };
 
-  buscarSesion = async ({ idSesion, idCliente }) => {
+  grabarRegla = () => {};
+
+  grabarNegocio = () => {};
+
+  grabarCliente = () => {};
+
+  grabarIntencion = () => {};
+
+  grabarCanal = () => {};
+
+  //Creaciones
+
+  crearCliente = async ({ idNegocio, idCanal }) => {
+    const estructuraBasica = {
+      estadoCliente: {
+        estadoUltimaRegla: '',
+        intencionEnEjecucion: '',
+        ultimaRegla: '',
+        proximaRegla: '',
+        botActivado: true,
+        topico: '',
+        variablesCliente: {
+          nombre: '',
+          valor: '',
+        },
+      },
+      fecha: moment(),
+    };
+
+    const idCliente = await this.#firestoreDB
+      .collection('clientes')
+      .add({ ...estructuraBasica, canal: idCanal, negocio: idNegocio });
+    return idCliente.id;
+  };
+
+  crearSesion = async (idCliente) => {
     const sesion = await this.#firestoreDB
       .collection('clientes')
       .doc(idCliente)
       .collection('sesiones')
-      .doc(idSesion)
-      .get();
-
+      .add({ fecha: moment() });
     return sesion;
   };
+
+  crearDominio = async ({topico, uid}) => {
+    const usuarioConsola = await this.#firestoreDB
+      .collection('agentes')
+      .doc(uid)
+      .get();
+
+    const { negocio } = await usuarioConsola.data();
+    const nuevoDominio = await this.#firestoreDB
+      .collection('dominios')
+      .add({ negocio , topico});
+      return nuevoDominio.id;
+  }
+
+  //Eliminar
+ 
+  eliminarDominio = async ({idDominio, uid}) => {
+
+    const nuevoDominio = await this.#firestoreDB
+      .collection('dominios')
+      .doc(idDominio)
+      .delete();
+      
+  }
+
+  eliminarRegla = () => {};
+
+  eliminarNegocio = () => {};
+
+  eliminarIntencion = () => {};
+
+  eliminarCliente = () => {};
+
+  eliminarCanal = () => {};
+
+ 
+
+
+  
 }
 
 module.exports = { ManejadorDatosInternos };
