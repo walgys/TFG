@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
   colors,
+  Autocomplete,
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
@@ -54,7 +55,6 @@ const ModalPropiedades = (props) => {
                 id="panel1a-header"
               >
                 <Typography>{key}</Typography>
-               
               </AccordionSummary>
               <AccordionDetails>
                 <List key={`list-${key}`}>
@@ -133,26 +133,35 @@ const ModalPropiedades = (props) => {
                                       margin: '8px 16px 8px 16px',
                                     }}
                                   >
-                                    <TextField
-                                      value={
-                                        configuracionRegla[key][indice]
-                                          .idIntencion ?? ''
-                                      }
-                                      onChange={(e) =>
-                                        onCambiarConfiguracion(
-                                          key,
-                                          configuracionRegla[key].map((el, i) =>
-                                            i === indice
-                                              ? {
-                                                  ...el,
-                                                  idIntencion: e.target.value,
-                                                }
-                                              : el
-                                          )
-                                        )
-                                      }
-                                      label="id intención"
-                                    ></TextField>
+                                    <Autocomplete
+                                      disablePortal
+                                      id="intenciones-combo"
+                                      options={intencionesEstado}
+                                      value={configuracionRegla[key][indice].intencion || null}
+                                      onChange={(e,valor) =>
+                                            onCambiarConfiguracion(
+                                              key,
+                                              configuracionRegla[key].map(
+                                                (el, i) =>
+                                                  i === indice
+                                                    ? {
+                                                        ...el,
+                                                        intencion:
+                                                          valor,
+                                                      }
+                                                    : el
+                                              )
+                                            )
+                                          }
+                                      sx={{ width: 300 }}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          label="intencion"
+                                          
+                                        />
+                                      )}
+                                    />
                                   </FormControl>
                                 </ListItem>
                                 <ListItem key={`${indice}-texto`}>
@@ -342,15 +351,14 @@ const ModalPropiedades = (props) => {
           {JSON.stringify(propiedades)}
         </Typography>
       );
-    } 
+    }
     if (tipo === 'eliminarDominio') {
       return (
         <Typography id="modal-modal-title" variant="h6" component="h2">
           {`¿Está seguro que desea eliminar el dominio ${propiedades.topico} ?`}
         </Typography>
       );
-    } 
-    else {
+    } else {
       return (
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Sin datos
@@ -362,11 +370,10 @@ const ModalPropiedades = (props) => {
   const [reglaSeleccionada, setReglaSeleccionada] = useState({ id: '' });
   const [configuracionRegla, setConfiguracionRegla] = useState({});
   const [nuevoDominio, setNuevoDominio] = useState('');
-  useEffect(() => {
-    console.log(configuracionRegla);
-  }, [configuracionRegla]);
+  const [intencionesEstado, setIintencionesEstado] = useState([]);
 
-  const { estadoModal, cerrar, propiedades, tipo, aceptar } = props;
+  const { estadoModal, cerrar, propiedades, tipo, aceptar, intenciones } =
+    props;
   const style = {
     position: 'absolute',
     top: '50%',
@@ -382,6 +389,11 @@ const ModalPropiedades = (props) => {
     p: 4,
   };
 
+  useEffect(() => {
+    console.log(intenciones);
+    if (intenciones) setIintencionesEstado(intenciones.map(intencion=>({label: intencion.intencion, id: intencion.id})));
+  }, [intenciones]);
+
   const restablecerModal = () => {
     setReglaSeleccionada({ id: '' });
     setConfiguracionRegla({});
@@ -390,7 +402,7 @@ const ModalPropiedades = (props) => {
 
   const aceptarModal = (tipo) => {
     if (tipo === 'nuevoDominio') aceptar(nuevoDominio);
-    if (tipo === 'eliminarDominio') aceptar(propiedades.id)
+    if (tipo === 'eliminarDominio') aceptar(propiedades.id);
     cerrarModal();
   };
 

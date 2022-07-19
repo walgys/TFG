@@ -298,6 +298,7 @@ const Intenciones = (props) => {
                               cambiarEstadoModal({
                                 tipo: 'nuevaRegla',
                                 propiedades: reglasEsquema,
+                                intenciones: dominiosEIntenciones.map(d=>d.intenciones).reduce((a,b)=> a.concat(b))
                               })
                             }
                           >
