@@ -311,6 +311,24 @@ const ModalPropiedades = (props) => {
           </FormControl>
         </div>
       );
+      if (tipo === 'nuevaIntencion')
+      return (
+        <div>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Nueva Intencion
+          </Typography>
+          <FormControl
+            fullWidth
+            sx={{ m: 1, minWidth: 230, margin: '8px 0px 8px 0px' }}
+          >
+            <TextField
+              value={intencion.intencion}
+              onChange={(e) => setIntencion({...intencion, intencion: e.target.value})}
+              label="Nombre"
+            ></TextField>
+          </FormControl>
+        </div>
+      );
     if (tipo === 'nuevaRegla')
       return (
         <div key="nuevaRegla">
@@ -358,6 +376,13 @@ const ModalPropiedades = (props) => {
           {`¿Está seguro que desea eliminar el dominio ${propiedades.topico} ?`}
         </Typography>
       );
+    }
+      if (tipo === 'eliminarIntencion') {
+        return (
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            {`¿Está seguro que desea eliminar la intencion ${propiedades.intencion} ?`}
+          </Typography>
+        );
     } else {
       return (
         <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -371,6 +396,7 @@ const ModalPropiedades = (props) => {
   const [configuracionRegla, setConfiguracionRegla] = useState({});
   const [nuevoDominio, setNuevoDominio] = useState('');
   const [intencionesEstado, setIintencionesEstado] = useState([]);
+  const [intencion, setIntencion] = useState({intencion: '', reglas: [], topico: '', dominio: '', disparadores: [], puedeDispararOtraIntencion: false});
 
   const { estadoModal, cerrar, propiedades, tipo, aceptar, intenciones } =
     props;
@@ -390,7 +416,6 @@ const ModalPropiedades = (props) => {
   };
 
   useEffect(() => {
-    console.log(intenciones);
     if (intenciones) setIintencionesEstado(intenciones.map(intencion=>({label: intencion.intencion, id: intencion.id})));
   }, [intenciones]);
 
@@ -403,6 +428,8 @@ const ModalPropiedades = (props) => {
   const aceptarModal = (tipo) => {
     if (tipo === 'nuevoDominio') aceptar(nuevoDominio);
     if (tipo === 'eliminarDominio') aceptar(propiedades.id);
+    if (tipo === 'nuevaIntencion') aceptar({...intencion, dominio: propiedades.id, topico: propiedades.topico});
+    if (tipo === 'eliminarIntencion') aceptar(propiedades.id);
     cerrarModal();
   };
 

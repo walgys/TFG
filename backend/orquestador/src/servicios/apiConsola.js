@@ -91,6 +91,29 @@ class ApiConsola {
       }
     })
 
+    client.on('crearIntencion', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        const nuevaIntencion = await this.#datosInternos.crearIntencion({uid, intencion: objetoDatos.intencion});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            negocio: negocio,
+          })
+        );
+
+      }
+    })
+
     client.on('eliminarDominio', async (datos) => {
       const objetoDatos = JSON.parse(datos);
       const decodificado = await this.#verificadorTokens.verificarTokenFB(
@@ -100,7 +123,30 @@ class ApiConsola {
 
       if (uid) {
       
-        const nuevoDominio = await this.#datosInternos.eliminarDominio({uid, idDominio: objetoDatos.dominio});
+        await this.#datosInternos.eliminarDominio({idDominio: objetoDatos.dominio});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            negocio: negocio,
+          })
+        );
+
+      }
+    })
+
+    client.on('eliminarIntencion', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        await this.#datosInternos.eliminarIntencion({idIntencion: objetoDatos.intencion});
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(

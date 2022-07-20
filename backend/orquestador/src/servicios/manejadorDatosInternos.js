@@ -275,22 +275,38 @@ class ManejadorDatosInternos {
       return nuevoDominio.id;
   }
 
+  crearIntencion = async ({intencion, uid}) => {
+    const usuarioConsola = await this.#firestoreDB
+      .collection('agentes')
+      .doc(uid)
+      .get();
+
+    const { negocio } = await usuarioConsola.data();
+    const nuevaIntencion = await this.#firestoreDB
+      .collection('intenciones')
+      .add({ negocio , ...intencion});
+      return nuevaIntencion.id;
+  }
+
   //Eliminar
  
-  eliminarDominio = async ({idDominio, uid}) => {
-
-    const nuevoDominio = await this.#firestoreDB
+  eliminarDominio = async ({idDominio}) => {
+    await this.#firestoreDB
       .collection('dominios')
       .doc(idDominio)
       .delete();
-      
+  }
+
+  eliminarIntencion = async ({idIntencion}) => {
+    await this.#firestoreDB
+      .collection('intenciones')
+      .doc(idIntencion)
+      .delete();
   }
 
   eliminarRegla = () => {};
 
   eliminarNegocio = () => {};
-
-  eliminarIntencion = () => {};
 
   eliminarCliente = () => {};
 

@@ -50,7 +50,13 @@ class AdministradorConexion {
     this.socket.emit('obtenerReglasEsquema', JSON.stringify(mensaje));
   };
 
-  crearIntencion = () => {};
+  crearIntencion = (mensaje) => {
+    this.socket.emit('crearIntencion', JSON.stringify(mensaje));
+  };
+
+  eliminarIntencion = (mensaje) => {
+    this.socket.emit('eliminarIntencion', JSON.stringify(mensaje));
+  };
 
   crearDominio = (mensaje) => {
     this.socket.emit('crearDominio', JSON.stringify(mensaje));
@@ -60,8 +66,7 @@ class AdministradorConexion {
     this.socket.emit('eliminarDominio', JSON.stringify(mensaje));
   };
 
-  enviarMensaje = (mensaje) => {
-    
+  enviarMensaje = (mensaje) => {  
     this.socket.emit('mensajeConsolaEntrante', JSON.stringify(mensaje));
   };
 

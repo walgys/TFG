@@ -88,6 +88,13 @@ const Intenciones = (props) => {
     administradorConexion.eliminarDominio({ token, dominio });
   };
 
+  const crearIntencion = (intencion) => {
+    administradorConexion.crearIntencion({ token, intencion });
+  };
+
+  const eliminarIntencion = (intencion) => {
+    administradorConexion.eliminarIntencion({ token, intencion });
+  };
 
   return (
     <Paper>
@@ -122,16 +129,23 @@ const Intenciones = (props) => {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          width: '100%'
+                          width: '100%',
                         }}
                       >
                         <Typography>{dominio?.topico}</Typography>
-                        <IconButton aria-label="delete" onClick={() =>
-                    cambiarEstadoModal({
-                      tipo: 'eliminarDominio',
-                      aceptar: eliminarDominio,
-                      propiedades: {id: dominio.id, topico: dominio.topico}
-                    })}>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() =>
+                            cambiarEstadoModal({
+                              tipo: 'eliminarDominio',
+                              aceptar: eliminarDominio,
+                              propiedades: {
+                                id: dominio.id,
+                                topico: dominio.topico,
+                              },
+                            })
+                          }
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </div>
@@ -145,7 +159,18 @@ const Intenciones = (props) => {
                             >
                               <Typography>{intencion?.intencion}</Typography>
                             </ListItemButton>
-                            <IconButton>
+                            <IconButton
+                              onClick={() =>
+                                cambiarEstadoModal({
+                                  tipo: 'eliminarIntencion',
+                                  aceptar: eliminarIntencion,
+                                  propiedades: {
+                                    id: intencion.id,
+                                    intencion: intencion.intencion,
+                                  },
+                                })
+                              }
+                            >
                               <RemoveIcon sx={{ color: 'red' }} />
                             </IconButton>
                           </ListItem>
@@ -156,7 +181,14 @@ const Intenciones = (props) => {
                           <IconButton
                             sx={{ backgroundColor: colors.blue[400] }}
                             onClick={() =>
-                              cambiarEstadoModal({ tipo: 'nuevaIntencion' })
+                              cambiarEstadoModal({
+                                tipo: 'nuevaIntencion',
+                                propiedades: {
+                                  id: dominio.id,
+                                  topico: dominio.topico,
+                                },
+                                aceptar: crearIntencion,
+                              })
                             }
                           >
                             <AddIcon
@@ -298,7 +330,9 @@ const Intenciones = (props) => {
                               cambiarEstadoModal({
                                 tipo: 'nuevaRegla',
                                 propiedades: reglasEsquema,
-                                intenciones: dominiosEIntenciones.map(d=>d.intenciones).reduce((a,b)=> a.concat(b))
+                                intenciones: dominiosEIntenciones
+                                  .map((d) => d.intenciones)
+                                  .reduce((a, b) => a.concat(b)),
                               })
                             }
                           >
@@ -338,31 +372,10 @@ const Intenciones = (props) => {
                                 })
                               }
                             >
-                              <Typography>{propiedad.llave}</Typography>
+                              <Typography>{`${propiedad.llave}: ${propiedad.valor}`}</Typography>
                             </ListItemButton>
-                            <IconButton>
-                              <RemoveIcon sx={{ color: 'red' }} />
-                            </IconButton>
                           </ListItem>
                         ))}
-                        <ListItem
-                          sx={{ display: 'flex', justifyContent: 'center' }}
-                        >
-                          <IconButton
-                            sx={{ backgroundColor: colors.blue[400] }}
-                            onClick={() =>
-                              cambiarEstadoModal({
-                                tipo: 'nuevoParametroConfiguracion',
-                              })
-                            }
-                          >
-                            <AddIcon
-                              sx={{
-                                color: colors.common.white,
-                              }}
-                            />
-                          </IconButton>
-                        </ListItem>{' '}
                       </List>
                     </AccordionDetails>
                   </Accordion>
