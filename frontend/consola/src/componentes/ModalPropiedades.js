@@ -33,13 +33,13 @@ const ModalPropiedades = (props) => {
   };
 
   const onCambiarConfiguracion = (key, value) => {
-    console.log('key', key);
-    console.log('value', value);
+
     setConfiguracionRegla({ ...configuracionRegla, [key]: value });
   };
 
   const obtenerArreglo = (key) => {
-    if (reglaSeleccionada.id === 'MENU')
+
+    if (reglaSeleccionada.id === 'MENU' || reglaSeleccionada.tipo === 'MENU')
       return {
         orden: 9,
         valor: (
@@ -82,7 +82,7 @@ const ModalPropiedades = (props) => {
                         <AccordionDetails>
                           <List key={`list-${indice}`}>
                             <ListItem key={`${indice}-accion`}>
-                              <ListItemButton onClick={() => console.log}>
+                              <ListItemButton>
                                 <FormControl
                                   fullWidth
                                   key={key}
@@ -137,7 +137,9 @@ const ModalPropiedades = (props) => {
                                       disablePortal
                                       id="intenciones-combo"
                                       options={intencionesEstado}
-                                      value={configuracionRegla[key][indice].intencion || null}
+                                      getOptionLabel={option => option.label ? option.label : intencionesEstado.find(i=>i.value === option).label}
+                                      isOptionEqualToValue={(option, value) => option.value === value}
+                                      value={configuracionRegla[key][indice].idIntencion || null}
                                       onChange={(e,valor) =>
                                             onCambiarConfiguracion(
                                               key,
@@ -146,8 +148,8 @@ const ModalPropiedades = (props) => {
                                                   i === indice
                                                     ? {
                                                         ...el,
-                                                        intencion:
-                                                          valor,
+                                                        idIntencion:
+                                                          valor.value,
                                                       }
                                                     : el
                                               )
@@ -304,8 +306,8 @@ const ModalPropiedades = (props) => {
             sx={{ m: 1, minWidth: 230, margin: '8px 0px 8px 0px' }}
           >
             <TextField
-              value={nuevoDominio}
-              onChange={(e) => setNuevoDominio(e.target.value)}
+              value={dominio}
+              onChange={(e) => setDominio(e.target.value)}
               label="Tópico del dominio"
             ></TextField>
           </FormControl>
@@ -348,6 +350,7 @@ const ModalPropiedades = (props) => {
               onChange={(e) => onSeleccionarRegla(e.target.value)}
             >
               {propiedades.map((regla) => (
+                
                 <MenuItem key={regla.id} value={regla.id}>
                   {regla.id}
                 </MenuItem>
@@ -355,19 +358,27 @@ const ModalPropiedades = (props) => {
             </Select>
           </FormControl>
 
-          {reglaSeleccionada.configuracion &&
-            Object.entries(reglaSeleccionada.configuracion)
+          {configuracionRegla &&
+            Object.entries(configuracionRegla)
               .map(([key, value]) => obtenerControlFormulario(key, value))
               .sort((a, b) => a.orden - b.orden)
               .map((el) => el.valor)}
         </div>
       );
 
-    if (tipo === 'regla') {
+    if (tipo === 'modificarRegla') {  
       return (
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          {JSON.stringify(propiedades)}
-        </Typography>
+        <div key="modificarRegla">
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            {reglaSeleccionada.tipo}
+          </Typography>
+          
+          {configuracionRegla &&
+            Object.entries(configuracionRegla)
+              .map(([key, value]) => obtenerControlFormulario(key, value))
+              .sort((a, b) => a.orden - b.orden)
+              .map((el) => el.valor)}
+        </div>
       );
     }
     if (tipo === 'eliminarDominio') {
@@ -394,11 +405,11 @@ const ModalPropiedades = (props) => {
 
   const [reglaSeleccionada, setReglaSeleccionada] = useState({ id: '' });
   const [configuracionRegla, setConfiguracionRegla] = useState({});
-  const [nuevoDominio, setNuevoDominio] = useState('');
+  const [dominio, setDominio] = useState('');
   const [intencionesEstado, setIintencionesEstado] = useState([]);
   const [intencion, setIntencion] = useState({intencion: '', reglas: [], topico: '', dominio: '', disparadores: [], puedeDispararOtraIntencion: false});
 
-  const { estadoModal, cerrar, propiedades, tipo, aceptar, intenciones } =
+  const { estadoModal, cerrar, propiedades, tipo, aceptar, intenciones, regla } =
     props;
   const style = {
     position: 'absolute',
@@ -416,26 +427,61 @@ const ModalPropiedades = (props) => {
   };
 
   useEffect(() => {
-    if (intenciones) setIintencionesEstado(intenciones.map(intencion=>({label: intencion.intencion, id: intencion.id})));
+    if (intenciones) setIintencionesEstado(intenciones.map(intencion=>({label: intencion.intencion, value: intencion.id})));
   }, [intenciones]);
 
-  const restablecerModal = () => {
-    setReglaSeleccionada({ id: '' });
-    setConfiguracionRegla({});
-    setNuevoDominio('');
-  };
+  useEffect(() => {
+    if (regla && reglaSeleccionada.id === ''){
+      setReglaSeleccionada(regla);
+      setConfiguracionRegla({ ...regla.configuracion });
+    }
+  }, [regla])
 
   const aceptarModal = (tipo) => {
-    if (tipo === 'nuevoDominio') aceptar(nuevoDominio);
-    if (tipo === 'eliminarDominio') aceptar(propiedades.id);
-    if (tipo === 'nuevaIntencion') aceptar({...intencion, dominio: propiedades.id, topico: propiedades.topico});
-    if (tipo === 'eliminarIntencion') aceptar(propiedades.id);
+
+    //Creaciones
+
+    if (tipo === 'nuevoDominio'){
+      //reglas de validación de datos
+      aceptar(dominio);
+    }
+    
+    if (tipo === 'nuevaRegla'){
+      //reglas de validación de datos
+      aceptar({configuracion: {...configuracionRegla, tipo: reglaSeleccionada.id}});
+    }
+
+    if (tipo === 'nuevaIntencion'){
+      //reglas de validación de datos
+      aceptar({...intencion, dominio: propiedades.id, topico: propiedades.topico});
+    }
+
+    //Modificaciones
+    
+    if (tipo === 'modificarDominio'){
+      //reglas de validación de datos
+      aceptar(dominio);
+    }
+
+    if (tipo === 'modificarRegla'){
+      //reglas de validación de datos
+      aceptar({...reglaSeleccionada, configuracion: configuracionRegla});
+    }
+
+    if (tipo === 'modificarIntencion'){
+      //reglas de validación de datos
+      aceptar(intencion);
+    }
+
+    //Eliminaciones
+
+    if (tipo === 'eliminarDominio' || tipo === 'eliminarIntencion' || tipo === 'eliminarRegla') aceptar(propiedades.id);
+
     cerrarModal();
   };
 
   const cerrarModal = () => {
     cerrar();
-    restablecerModal();
   };
 
   return (

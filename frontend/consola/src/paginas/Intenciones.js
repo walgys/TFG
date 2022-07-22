@@ -80,20 +80,48 @@ const Intenciones = (props) => {
     setEstadoModal(false);
   };
 
+  //creaciones
+
   const crearDominio = (dominio) => {
     administradorConexion.crearDominio({ token, dominio });
-  };
-
-  const eliminarDominio = (dominio) => {
-    administradorConexion.eliminarDominio({ token, dominio });
   };
 
   const crearIntencion = (intencion) => {
     administradorConexion.crearIntencion({ token, intencion });
   };
+  
+  const crearRegla = (regla) => {
+    console.log(JSON.stringify(regla))
+    //administradorConexion.crearRegla({ token, regla });
+  };
 
+  //modificaciones
+
+  const modificarDominio = (dominio) => {
+    administradorConexion.modificarDominio({ token, dominio });
+  };
+
+  const modificarIntencion = (intencion) => {
+    administradorConexion.modificarIntencion({ token, intencion });
+  };
+  
+  const modificarRegla = (regla) => {
+    console.log(JSON.stringify(regla))
+  //administradorConexion.modificarRegla({ token, regla });
+  };
+
+  //eliminaciones
+  
+  const eliminarDominio = (dominio) => {
+    administradorConexion.eliminarDominio({ token, dominio });
+  };
+  
   const eliminarIntencion = (intencion) => {
     administradorConexion.eliminarIntencion({ token, intencion });
+  };
+
+  const eliminarRegla = (regla) => {
+    administradorConexion.eliminarRegla({ token, regla });
   };
 
   return (
@@ -309,8 +337,12 @@ const Intenciones = (props) => {
                               }}
                               onClick={() =>
                                 cambiarEstadoModal({
-                                  propiedades: regla,
-                                  tipo: 'regla',
+                                  regla: regla,
+                                  intenciones: dominiosEIntenciones
+                                  .map((d) => d.intenciones)
+                                  .reduce((a, b) => a.concat(b)),
+                                  tipo: 'modificarRegla',
+                                  aceptar: modificarRegla,
                                 })
                               }
                             >
@@ -333,7 +365,9 @@ const Intenciones = (props) => {
                                 intenciones: dominiosEIntenciones
                                   .map((d) => d.intenciones)
                                   .reduce((a, b) => a.concat(b)),
+                                aceptar: crearRegla
                               })
+
                             }
                           >
                             <AddIcon
@@ -385,11 +419,11 @@ const Intenciones = (props) => {
           </Paper>
         </div>
       </div>
-      <ModalPropiedades
+      {estadoModal && <ModalPropiedades
         estadoModal={estadoModal}
         cerrar={cerrar}
         {...parametrosModal}
-      />
+      />}
     </Paper>
   );
 };
