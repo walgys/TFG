@@ -25,7 +25,7 @@ import ModalPropiedades from '../componentes/ModalPropiedades';
 
 const Intenciones = (props) => {
   const { estado, administradorConexion } = useContext(AppContext);
-  const { usuario, dominiosEIntenciones, reglasEsquema } = estado;
+  const { usuario, dominiosEIntenciones, reglasEsquema, intencionActualizada } = estado;
   const { token } = usuario;
   const [intencionEdicion, setIntencionEdicion] = useState();
   const [configuracion, setConfiguracion] = useState([]);
@@ -52,13 +52,21 @@ const Intenciones = (props) => {
     }
   }, [intencionEdicion]);
 
+ useEffect(() => {
+  console.log(intencionActualizada)
+   if(intencionActualizada && intencionEdicion.id === intencionActualizada?.id){
+    setIntencionEdicion(intencionActualizada);
+   } 
+ }, [intencionActualizada])
+ 
+
   const obtenerDominiosCallback = useCallback((token) => {
-    administradorConexion.obtenerDominiosEIntenciones({
+    administradorConexion.enviarMensaje({tipo: 'obtenerDominiosEIntenciones', mensaje: {
       token: token,
-    });
-    administradorConexion.obtenerReglasEsquema({
+    }});
+    administradorConexion.enviarMensaje({tipo: 'obtenerReglasEsquema', mensaje: {
       token: token,
-    });
+    }});
   }, []);
 
   useEffect(() => {
@@ -66,10 +74,6 @@ const Intenciones = (props) => {
       obtenerDominiosCallback(usuario.token);
     }
   }, [usuario.token]);
-
-  const enviarMensajeHandler = () => {
-    console.log('aprete');
-  };
 
   const cambiarEstadoModal = (parametros) => {
     setParametrosModal(parametros);
@@ -83,45 +87,45 @@ const Intenciones = (props) => {
   //creaciones
 
   const crearDominio = (dominio) => {
-    administradorConexion.crearDominio({ token, dominio });
+    administradorConexion.enviarMensaje({tipo: 'crearDominio', mensaje: { token, dominio }});
   };
 
   const crearIntencion = (intencion) => {
-    administradorConexion.crearIntencion({ token, intencion });
+    administradorConexion.enviarMensaje({tipo: 'crearIntencion', mensaje: { token, intencion }});
   };
   
   const crearRegla = (regla) => {
-    console.log(JSON.stringify(regla))
-    //administradorConexion.crearRegla({ token, regla });
+    console.log(JSON.stringify({intencionId: intencionEdicion.id, regla}))
+    administradorConexion.enviarMensaje({tipo: 'crearRegla', mensaje: { token, intencionId: intencionEdicion.id, regla }});
   };
 
   //modificaciones
 
   const modificarDominio = (dominio) => {
-    administradorConexion.modificarDominio({ token, dominio });
+    administradorConexion.enviarMensaje({tipo: 'modificarDominio', mensaje: { token, dominio }});
   };
 
   const modificarIntencion = (intencion) => {
-    administradorConexion.modificarIntencion({ token, intencion });
+    administradorConexion.enviarMensaje({tipo:'modificarIntencion', mensaje: { token, intencion }});
   };
   
   const modificarRegla = (regla) => {
-    console.log(JSON.stringify(regla))
-  //administradorConexion.modificarRegla({ token, regla });
+    const nevasReglas = intencionEdicion.reglas.map(r=>r.id === regla.id ? regla : r);
+  administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, reglas: nevasReglas} }});
   };
 
   //eliminaciones
   
   const eliminarDominio = (dominio) => {
-    administradorConexion.eliminarDominio({ token, dominio });
+    administradorConexion.enviarMensaje({tipo:'eliminarDominio', mensaje: { token, dominio }});
   };
   
   const eliminarIntencion = (intencion) => {
-    administradorConexion.eliminarIntencion({ token, intencion });
+    administradorConexion.enviarMensaje({tipo: 'eliminarIntencion', mensaje: { token, intencion }});
   };
 
   const eliminarRegla = (regla) => {
-    administradorConexion.eliminarRegla({ token, regla });
+    administradorConexion.enviarMensaje({tipo: 'eliminarRegla', mensaje: { token, regla }});
   };
 
   return (

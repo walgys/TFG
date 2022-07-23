@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
 const path = require('path');
 const moment = require('moment');
@@ -59,6 +59,16 @@ class ManejadorDatosInternos {
     );
     return { dominiosEIntenciones: dominiosEIntenciones, negocio: negocio };
   };
+
+  generarId = (longitud) =>{
+    const caracteres =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let id = '';
+    for(let i = 0; i < longitud; i++){
+      id += caracteres[Math.floor(Math.random()*caracteres.length)];
+    }
+    return id;
+  }
 
   buscarReglasEsquema = async () => {
     const reglas = await this.#firestoreDB
@@ -218,13 +228,17 @@ class ManejadorDatosInternos {
       });
   };
 
-  grabarRegla = () => {};
-
   grabarNegocio = () => {};
 
   grabarCliente = () => {};
 
-  grabarIntencion = () => {};
+  actualizarIntencion = async ({intencion}) => {
+    const {id, ...rest} = intencion;
+    const intencionDoc = await this.#firestoreDB.collection('intenciones').doc(id);
+    intencionDoc.update(rest);
+    const intencionActualizada = await intencionDoc.get();
+    return {id:intencionActualizada.id, ...intencionActualizada.data()};
+  };
 
   grabarCanal = () => {};
 
@@ -286,6 +300,19 @@ class ManejadorDatosInternos {
       .collection('intenciones')
       .add({ negocio , ...intencion});
       return nuevaIntencion.id;
+  }
+
+  crearRegla = async ({intencionId, regla}) => {
+    const reglaId = this.generarId(20);
+
+    const intencion = await this.#firestoreDB
+      .collection('intenciones')
+      .doc(intencionId)
+
+    const IntencionActualizada = await intencion
+      .update({ reglas: FieldValue.arrayUnion({...regla, id: reglaId})});
+    const intencionActualizada = await intencion.get();
+      return {id: intencionActualizada.id, ...intencionActualizada.data()};
   }
 
   //Eliminar

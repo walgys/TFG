@@ -448,7 +448,7 @@ const ModalPropiedades = (props) => {
     
     if (tipo === 'nuevaRegla'){
       //reglas de validación de datos
-      aceptar({configuracion: {...configuracionRegla, tipo: reglaSeleccionada.id}});
+      aceptar({configuracion: {...configuracionRegla}, tipo: reglaSeleccionada.id});
     }
 
     if (tipo === 'nuevaIntencion'){

@@ -114,6 +114,54 @@ class ApiConsola {
       }
     })
 
+    client.on('crearRegla', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        const intencionActualizada= await this.#datosInternos.crearRegla({intencionId: objetoDatos.intencionId, regla: objetoDatos.regla});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            intencionActualizada,
+            negocio: negocio,
+          })
+        );
+
+      }
+    })
+
+    client.on('actualizarIntencion', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+
+      if (uid) {
+      
+        const intencionActualizada= await this.#datosInternos.actualizarIntencion({intencion: objetoDatos.intencion});
+        const { dominiosEIntenciones, negocio } =
+          await this.#datosInternos.obtenerDominiosEIntenciones(uid);
+        await client.emit(
+          'respuestaObtenerDominiosEIntenciones',
+          JSON.stringify({
+            dominiosEIntenciones: dominiosEIntenciones,
+            intencionActualizada,
+            negocio: negocio,
+          })
+        );
+
+      }
+    })
+
     client.on('eliminarDominio', async (datos) => {
       const objetoDatos = JSON.parse(datos);
       const decodificado = await this.#verificadorTokens.verificarTokenFB(

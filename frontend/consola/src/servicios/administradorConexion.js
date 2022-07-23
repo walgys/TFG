@@ -40,38 +40,8 @@ class AdministradorConexion {
     });
   };
 
-  obtenerDominiosEIntenciones = (mensaje) => {
-    this.socket.emit('obtenerDominiosEIntenciones', JSON.stringify(mensaje));
-  };
-
-  modificarIntencion = () => {};
-
-  obtenerReglasEsquema = (mensaje) => {
-    this.socket.emit('obtenerReglasEsquema', JSON.stringify(mensaje));
-  };
-
-  crearIntencion = (mensaje) => {
-    this.socket.emit('crearIntencion', JSON.stringify(mensaje));
-  };
-
-  eliminarIntencion = (mensaje) => {
-    this.socket.emit('eliminarIntencion', JSON.stringify(mensaje));
-  };
-
-  crearDominio = (mensaje) => {
-    this.socket.emit('crearDominio', JSON.stringify(mensaje));
-  };
-
-  eliminarDominio = (mensaje) => {
-    this.socket.emit('eliminarDominio', JSON.stringify(mensaje));
-  };
-
-  enviarMensaje = (mensaje) => {  
-    this.socket.emit('mensajeConsolaEntrante', JSON.stringify(mensaje));
-  };
-
-  obtenerMensaje = () => {
-    this.socket.emit('obtenerMensaje', '');
+  enviarMensaje = ({tipo, mensaje}) => {  
+    this.socket.emit(tipo, JSON.stringify(mensaje));
   };
 
   heartbeat = () => {
