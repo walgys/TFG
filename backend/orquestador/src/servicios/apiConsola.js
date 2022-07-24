@@ -112,7 +112,7 @@ class ApiConsola {
         );
 
       }
-    })
+    });
 
     client.on('crearRegla', async (datos) => {
       const objetoDatos = JSON.parse(datos);
@@ -123,7 +123,12 @@ class ApiConsola {
 
       if (uid) {
       
-        const intencionActualizada= await this.#datosInternos.crearRegla({intencionId: objetoDatos.intencionId, regla: objetoDatos.regla});
+        let intencionActualizada = await this.#datosInternos.crearRegla({intencionId: objetoDatos.intencionId, regla: objetoDatos.regla});
+
+        if(objetoDatos.regla.tipo === 'MENU'){
+          intencionActualizada = await this.#datosInternos.crearRegla({intencionId: objetoDatos.intencionId, regla: {tipo: 'RESPUESTA_MENU'}});
+        }
+
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(

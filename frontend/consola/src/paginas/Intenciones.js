@@ -99,6 +99,17 @@ const Intenciones = (props) => {
     administradorConexion.enviarMensaje({tipo: 'crearRegla', mensaje: { token, intencionId: intencionEdicion.id, regla }});
   };
 
+  const crearDisparador = (disparador) => {
+    const disparadorExistente = intencionEdicion.disparadores.find(d=>d === disparador);
+    if(!disparadorExistente){
+      const disparadoresActualizados = [...intencionEdicion?.disparadores, disparador];
+      administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, disparadores: disparadoresActualizados} }});
+    }else{
+      console.log('Ya existe el disparador: ', disparadorExistente)
+    }
+    
+  };
+
   //modificaciones
 
   const modificarDominio = (dominio) => {
@@ -110,8 +121,13 @@ const Intenciones = (props) => {
   };
   
   const modificarRegla = (regla) => {
-    const nevasReglas = intencionEdicion.reglas.map(r=>r.id === regla.id ? regla : r);
-  administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, reglas: nevasReglas} }});
+    const nuevasReglas = intencionEdicion.reglas.map(r=>r.id === regla.id ? regla : r);
+  administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, reglas: nuevasReglas} }});
+  };
+
+  const modificarDisparador = ({disparadorAnterior, disparador}) => {
+    const disparadoresActualizados = intencionEdicion?.disparadores?.map(d => d === disparadorAnterior ? disparador : d);
+    administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, disparadores: disparadoresActualizados} }});
   };
 
   //eliminaciones
@@ -125,7 +141,13 @@ const Intenciones = (props) => {
   };
 
   const eliminarRegla = (regla) => {
-    administradorConexion.enviarMensaje({tipo: 'eliminarRegla', mensaje: { token, regla }});
+    const nuevasReglas = intencionEdicion.reglas.filter(r => r.id !== regla.id);
+    administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, reglas: nuevasReglas}}});
+  };
+
+  const eliminarDisparador = (disparador) => {
+    const nuevosDisparadores = intencionEdicion.disparadores.filter(d => d !== disparador);
+    administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, disparadores: nuevosDisparadores}}});
   };
 
   return (
@@ -286,14 +308,27 @@ const Intenciones = (props) => {
                         {intencionEdicion?.disparadores?.map((disparador) => (
                           <ListItem
                             key={disparador}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                            onClick={() => console.log(disparador)}
+                            >
+                            <ListItemButton
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                            onClick={() =>
+                              cambiarEstadoModal({
+                                tipo: 'modificarDisparador',
+                                propiedades: {id: disparador},
+                                aceptar: modificarDisparador
+                              })}
                           >
                             <Typography>{disparador}</Typography>
-                            <IconButton>
+                            </ListItemButton>
+                            <IconButton onClick={() =>
+                              cambiarEstadoModal({
+                                tipo: 'eliminarDisparador',
+                                propiedades: {id: disparador},
+                                aceptar: eliminarDisparador
+                              })}>
                               <RemoveIcon sx={{ color: 'red' }} />
                             </IconButton>
                           </ListItem>
@@ -307,6 +342,7 @@ const Intenciones = (props) => {
                             onClick={() =>
                               cambiarEstadoModal({
                                 tipo: 'nuevoDisparador',
+                                aceptar: crearDisparador
                               })
                             }
                           >
@@ -352,7 +388,14 @@ const Intenciones = (props) => {
                             >
                               <Typography>{regla.tipo}</Typography>
                             </ListItemButton>
-                            <IconButton>
+                            <IconButton onClick={() =>
+                            cambiarEstadoModal({
+                              tipo: 'eliminarRegla',
+                              aceptar: eliminarRegla,
+                              propiedades: regla
+                            })
+
+                            }>
                               <RemoveIcon sx={{ color: 'red' }} />
                             </IconButton>
                           </ListItem>

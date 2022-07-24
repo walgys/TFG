@@ -366,6 +366,45 @@ const ModalPropiedades = (props) => {
         </div>
       );
 
+      if (tipo === 'nuevoDisparador')
+      return (
+        <div>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Nuevo Disparador
+          </Typography>
+          <FormControl
+            fullWidth
+            sx={{ m: 1, minWidth: 230, margin: '8px 0px 8px 0px' }}
+          >
+            <TextField
+              value={disparador}
+              onChange={(e) => setDisparador(e.target.value)}
+              label="Texto del disparador"
+            ></TextField>
+          </FormControl>
+        </div>
+      );
+
+      if (tipo === 'modificarDisparador'){
+        if(disparador === '') setDisparador(propiedades.id)
+        return (
+        <div>
+          <FormControl
+            fullWidth
+            sx={{ m: 1, minWidth: 230, margin: '8px 0px 8px 0px' }}
+          >
+            <TextField
+              value={disparador}
+              onChange={(e) => setDisparador(e.target.value)}
+              label="Texto del disparador"
+            ></TextField>
+          </FormControl>
+        </div>
+      );
+      }
+      
+
+      
     if (tipo === 'modificarRegla') {  
       return (
         <div key="modificarRegla">
@@ -381,6 +420,7 @@ const ModalPropiedades = (props) => {
         </div>
       );
     }
+
     if (tipo === 'eliminarDominio') {
       return (
         <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -388,10 +428,24 @@ const ModalPropiedades = (props) => {
         </Typography>
       );
     }
-      if (tipo === 'eliminarIntencion') {
+    if (tipo === 'eliminarIntencion') {
+      return (
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          {`¿Está seguro que desea eliminar la intencion ${propiedades.intencion} ?`}
+        </Typography>
+      );
+    }
+    if (tipo === 'eliminarRegla') {
+      return (
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          {`¿Está seguro que desea eliminar la regla ${propiedades.tipo} ?`}
+        </Typography>
+      );
+    }
+      if (tipo === 'eliminarDisparador') {
         return (
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            {`¿Está seguro que desea eliminar la intencion ${propiedades.intencion} ?`}
+            {`¿Está seguro que desea eliminar el disparador ${propiedades.id} ?`}
           </Typography>
         );
     } else {
@@ -406,6 +460,7 @@ const ModalPropiedades = (props) => {
   const [reglaSeleccionada, setReglaSeleccionada] = useState({ id: '' });
   const [configuracionRegla, setConfiguracionRegla] = useState({});
   const [dominio, setDominio] = useState('');
+  const [disparador, setDisparador] = useState('');
   const [intencionesEstado, setIintencionesEstado] = useState([]);
   const [intencion, setIntencion] = useState({intencion: '', reglas: [], topico: '', dominio: '', disparadores: [], puedeDispararOtraIntencion: false});
 
@@ -456,6 +511,11 @@ const ModalPropiedades = (props) => {
       aceptar({...intencion, dominio: propiedades.id, topico: propiedades.topico});
     }
 
+    if (tipo === 'nuevoDisparador'){
+      //reglas de validación de datos
+      aceptar(disparador);
+    }
+
     //Modificaciones
     
     if (tipo === 'modificarDominio'){
@@ -473,9 +533,15 @@ const ModalPropiedades = (props) => {
       aceptar(intencion);
     }
 
+    if (tipo === 'modificarDisparador'){
+      aceptar({disparadorAnterior: propiedades.id, disparador})
+    }
+
     //Eliminaciones
 
-    if (tipo === 'eliminarDominio' || tipo === 'eliminarIntencion' || tipo === 'eliminarRegla') aceptar(propiedades.id);
+    if (tipo === 'eliminarDominio' || tipo === 'eliminarIntencion' || tipo === 'eliminarDisparador') aceptar(propiedades.id);
+
+    if(tipo === 'eliminarRegla') aceptar(propiedades);
 
     cerrarModal();
   };
