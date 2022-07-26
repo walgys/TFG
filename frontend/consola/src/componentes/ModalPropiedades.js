@@ -292,6 +292,7 @@ const ModalPropiedades = (props) => {
         ),
       };
     if (Array.isArray(value)) return obtenerArreglo(key);
+    
   };
 
   const construirFormulario = ({ propiedades, tipo }) => {

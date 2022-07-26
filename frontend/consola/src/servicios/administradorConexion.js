@@ -20,17 +20,7 @@ class AdministradorConexion {
   procesarMensajeWebsocket = (client) => {
     console.log(`connected to ${this.serverAddr}`);
 
-    this.socket.on('respuestaObtenerDominiosEIntenciones', (datos) => {
-      const objetoDatos = JSON.parse(datos);
-      this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
-    });
-
-    this.socket.on('respuestaObtenerReglasEsquema', (datos) => {
-      const objetoDatos = JSON.parse(datos);
-      this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
-    });
-
-    this.socket.on('respuestaCrearDominio', (datos) => {
+    this.socket.on('respuestaConsola', (datos) => {
       const objetoDatos = JSON.parse(datos);
       this.#setEstado((prevState) => ({ ...prevState, ...objetoDatos }));
     });

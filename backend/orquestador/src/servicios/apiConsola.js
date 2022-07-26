@@ -37,7 +37,7 @@ class ApiConsola {
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         client.emit(
-          'respuestaObtenerDominiosEIntenciones',
+          'respuestaConsola',
           JSON.stringify({
             dominiosEIntenciones: dominiosEIntenciones,
             negocio: negocio,
@@ -50,7 +50,7 @@ class ApiConsola {
       const parsedData = JSON.parse(data);
       console.log(`event: mensajeConsolaEntrante, data: ${data}`);
       client.emit(
-        'recibiMensajeConsolaEntrante',
+        'respuestaConsola',
         JSON.stringify({ id: parsedData.id })
       );
     });
@@ -62,9 +62,22 @@ class ApiConsola {
       );
       const uid = decodificado?.user_id;
       if (uid) {
-        const reglasEsquema = await this.#datosInternos.buscarReglasEsquema();
+        const reglasEsquema = await this.#datosInternos.obtenerReglasEsquema();
 
-        client.emit('respuestaObtenerReglasEsquema', JSON.stringify({ reglasEsquema: reglasEsquema }));
+        client.emit('respuestaConsola', JSON.stringify({ reglasEsquema: reglasEsquema }));
+      }
+    })
+
+    client.on('obtenerAgentes', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+      if (uid) {
+        const agentes = await this.#datosInternos.obtenerAgentes();
+
+        client.emit('respuestaConsola', JSON.stringify({ agentes: agentes }));
       }
     })
 
@@ -81,7 +94,7 @@ class ApiConsola {
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(
-          'respuestaObtenerDominiosEIntenciones',
+          'respuestaConsola',
           JSON.stringify({
             dominiosEIntenciones: dominiosEIntenciones,
             negocio: negocio,
@@ -104,7 +117,7 @@ class ApiConsola {
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(
-          'respuestaObtenerDominiosEIntenciones',
+          'respuestaConsola',
           JSON.stringify({
             dominiosEIntenciones: dominiosEIntenciones,
             negocio: negocio,
@@ -132,7 +145,7 @@ class ApiConsola {
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(
-          'respuestaObtenerDominiosEIntenciones',
+          'respuestaConsola',
           JSON.stringify({
             dominiosEIntenciones: dominiosEIntenciones,
             intencionActualizada,
@@ -156,7 +169,7 @@ class ApiConsola {
         const { dominiosEIntenciones, negocio } =
           await this.#datosInternos.obtenerDominiosEIntenciones(uid);
         await client.emit(
-          'respuestaObtenerDominiosEIntenciones',
+          'respuestaConsola',
           JSON.stringify({
             dominiosEIntenciones: dominiosEIntenciones,
             intencionActualizada,

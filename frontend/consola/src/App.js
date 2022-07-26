@@ -17,6 +17,8 @@ import { AuthContext, AppContext } from './utilitarios/contextos';
 import { useState } from 'react';
 import { useContext } from 'react';
 import AdministradorConexion from './servicios/administradorConexion';
+import Configuracion from './paginas/Configuracion';
+import Agentes from './paginas/Agentes';
 
 function useAuth(AuthContext) {
   return React.useContext(AuthContext);
@@ -105,16 +107,26 @@ function App() {
           <Container>
             <Navegacion />
             <Routes>
-              <Route path="/" element={<Navigate to="/Intenciones" />} />
-              <Route path="/Ingreso" element={<Ingreso useAuth={useAuth} />} />
+              <Route path="/" element={<Navigate to="/intenciones" />} />
+              <Route path="/ingreso" element={<Ingreso useAuth={useAuth} />} />
               <Route
-                path="/Intenciones"
+                path="/intenciones"
                 element={
                   <RequireAuth>
                     <Intenciones />
                   </RequireAuth>
                 }
               />
+               <Route path='/agentes' element={
+                <RequireAuth>
+                  <Agentes />
+                </RequireAuth>
+              } />
+              <Route path='/configuracion' element={
+                <RequireAuth>
+                  <Configuracion />
+                </RequireAuth>
+              } />
             </Routes>
           </Container>
         </BrowserRouter>

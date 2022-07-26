@@ -12,14 +12,18 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = ['Intenciones','Chats', 'Agentes', 'Canales', 'Configuración' ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
+const paginas = {
+  'Intenciones': 'intenciones','Chats': 'chats', 'Agentes': 'agentes', 'Canales': 'canales' , 'Configuración': 'configuracion'
+}
 
 const Navegacion = () => {
     const [anchorElNav, setAnchorElNav] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
+    const navigation = useNavigate();
   
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
@@ -28,7 +32,12 @@ const Navegacion = () => {
       setAnchorElUser(event.currentTarget);
     };
   
-    const handleCloseNavMenu = () => {
+    const navegar = (page) => {
+      setAnchorElNav(null);
+      navigation(`/${paginas[page]}`, {replace: true})
+    };
+
+    const handleCloseNavMenu = (page) => {
       setAnchorElNav(null);
     };
   
@@ -56,7 +65,7 @@ const Navegacion = () => {
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              BOTAID
             </Typography>
   
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -89,7 +98,7 @@ const Navegacion = () => {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <MenuItem key={page} onClick={()=>navegar(page)}>
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
@@ -118,7 +127,7 @@ const Navegacion = () => {
               {pages.map((page) => (
                 <Button
                   key={page}
-                  onClick={handleCloseNavMenu}
+                  onClick={()=>navegar(page)}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
                   {page}

@@ -70,9 +70,17 @@ class ManejadorDatosInternos {
     return id;
   }
 
-  buscarReglasEsquema = async () => {
+  obtenerReglasEsquema = async () => {
     const reglas = await this.#firestoreDB
       .collection('reglas_esquema')
+      .get();
+      
+      return reglas.docs.map(regla=>({ id: regla.id, ...regla.data() }));
+  };
+
+  obtenerAgentes = async () => {
+    const reglas = await this.#firestoreDB
+      .collection('agentes')
       .get();
       
       return reglas.docs.map(regla=>({ id: regla.id, ...regla.data() }));
