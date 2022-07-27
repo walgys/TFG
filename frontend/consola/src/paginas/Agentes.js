@@ -47,8 +47,6 @@ const Agentes = () => {
     }
   }, [agentes])
 
-  console.log(roles)
-
   return (
     <Paper>
       <div style={{ display: 'flex', minHeight: '90vh' }}>

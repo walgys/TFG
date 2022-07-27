@@ -9,8 +9,99 @@ import {
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { AppContext } from '../utilitarios/contextos';
 
-const configuracion = () => {
+const Configuracion = () => {
+
+  const { estado, administradorConexion } = useContext(AppContext);
+  const { usuario, negocio } = estado;
+  const [opcionSeleccionada, setOpcionSeleccionada] = useState();
+  const propiedadATexto = {
+    configuracionDatosExternos: 'Datos Externos',
+    variablesCliente: 'Variables',
+    constantesCliente: 'Constantes'
+  }
+
+  const negocioCallback = useCallback((token) => {
+    administradorConexion.enviarMensaje({
+      tipo: 'obtenerNegocio',
+      mensaje: {
+        token: token,
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (usuario.token !== '') {
+      negocioCallback(usuario.token);
+    }
+  }, [usuario.token]);
+
+  useEffect(() => {
+    console.log(opcionSeleccionada)
+  }, [opcionSeleccionada])
+
+  const seleccionarOpcion = (clave) => {
+    console.log(clave)
+    setOpcionSeleccionada(clave);
+  }
+
+  const obtenerEstructura = (opcionSeleccionada) => {
+    const estructura = negocio[opcionSeleccionada];
+      if(typeof estructura == 'object') return <Accordion
+      sx={{ minWidth: '300px', width: '100%' }}
+      elevation={2}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography>{propiedadATexto[opcionSeleccionada]}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <List>
+        {Object.entries(estructura).sort().map(([clave, valor]) => {
+        if (typeof valor === 'string') 
+        return <ListItem key={`${clave} (${valor})`}>
+            <ListItemButton onClick={() => console.log(`${clave} (${valor})`)}>
+              <Typography>{`${clave} (${valor})`}</Typography>
+            </ListItemButton>
+          </ListItem>;
+        if(typeof valor === 'object')
+        return <Accordion
+        sx={{ minWidth: '300px', width: '100%' }}
+        elevation={2}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>{clave}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        <List>
+        {Object.entries(valor).map(([clave, valor]) => {
+           if (typeof valor === 'string') 
+           return <ListItem key={`${clave} (${valor})`}>
+               <ListItemButton onClick={() => console.log(`${clave} (${valor})`)}>
+                 <Typography>{`${clave} (${valor})`}</Typography>
+               </ListItemButton>
+             </ListItem>;
+        })}
+        </List>
+        </AccordionDetails>
+        </Accordion>
+      })          
+      }
+      </List>
+      </AccordionDetails>
+    </Accordion>
+  } 
+  
+
   return (
     <Paper>
       <div style={{ display: 'flex', minHeight: '90vh' }}>
@@ -38,21 +129,11 @@ const configuracion = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <List>
-                      <ListItem>
-                        <ListItemButton onClick={() => console.log('click')}>
-                          <Typography>Datos Externos</Typography>
+                      {negocio && Object.keys(negocio).sort().map( clave => clave !== 'id'  && (<ListItem key={clave}>
+                        <ListItemButton onClick={()=>seleccionarOpcion(clave)}>
+                          <Typography>{propiedadATexto[clave]}</Typography>
                         </ListItemButton>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemButton onClick={() => console.log('click')}>
-                          <Typography>Variables</Typography>
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemButton onClick={() => console.log('click')}>
-                          <Typography>Constantes</Typography>
-                        </ListItemButton>
-                      </ListItem>
+                      </ListItem>))}
                     </List>
                   </AccordionDetails>
                 </Accordion>
@@ -71,11 +152,11 @@ const configuracion = () => {
           <Paper
             style={{ height: '100%', padding: '10px' }}
             elevation={2}
-          ></Paper>
+          >{opcionSeleccionada && obtenerEstructura(opcionSeleccionada)}</Paper>
         </div>
       </div>
     </Paper>
   );
 };
 
-export default configuracion;
+export default Configuracion;

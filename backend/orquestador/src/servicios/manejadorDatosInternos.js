@@ -78,12 +78,38 @@ class ManejadorDatosInternos {
       return reglas.docs.map(regla=>({ id: regla.id, ...regla.data() }));
   };
 
-  obtenerAgentes = async () => {
-    const reglas = await this.#firestoreDB
+  obtenerAgentes = async (uid) => {
+
+    const usuarioConsola = await this.#firestoreDB
       .collection('agentes')
+      .doc(uid)
+      .get();
+
+    const { negocio } = usuarioConsola.data();
+
+    const agentes = await this.#firestoreDB
+      .collection('agentes')
+      .where('negocio', '==', negocio)
       .get();
       
-      return reglas.docs.map(regla=>({ id: regla.id, ...regla.data() }));
+      return agentes.docs.map(agente=>({ id: agente.id, ...agente.data() }));
+  };
+
+  obtenerNegocio = async (uid) => {
+
+    const usuarioConsola = await this.#firestoreDB
+      .collection('agentes')
+      .doc(uid)
+      .get();
+
+    const { negocio } = usuarioConsola.data();
+
+    const datosNegocio = await this.#firestoreDB
+      .collection('negocios')
+      .doc(negocio)
+      .get();
+
+      return { id: datosNegocio.id, ...datosNegocio.data() };
   };
 
   buscarDominios = async (idNegocio) => {

@@ -75,9 +75,22 @@ class ApiConsola {
       );
       const uid = decodificado?.user_id;
       if (uid) {
-        const agentes = await this.#datosInternos.obtenerAgentes();
+        const agentes = await this.#datosInternos.obtenerAgentes(uid);
 
         client.emit('respuestaConsola', JSON.stringify({ agentes: agentes }));
+      }
+    })
+
+    client.on('obtenerNegocio', async (datos) => {
+      const objetoDatos = JSON.parse(datos);
+      const decodificado = await this.#verificadorTokens.verificarTokenFB(
+        objetoDatos.token
+      );
+      const uid = decodificado?.user_id;
+      if (uid) {
+        const negocio = await this.#datosInternos.obtenerNegocio(uid);
+
+        client.emit('respuestaConsola', JSON.stringify({ negocio }));
       }
     })
 
