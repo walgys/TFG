@@ -19,6 +19,8 @@ import { useContext } from 'react';
 import AdministradorConexion from './servicios/administradorConexion';
 import Configuracion from './paginas/Configuracion';
 import Agentes from './paginas/Agentes';
+import Chats from './paginas/Chats';
+import Canales from './paginas/Canales';
 
 function useAuth(AuthContext) {
   return React.useContext(AuthContext);
@@ -125,6 +127,16 @@ function App() {
               <Route path='/configuracion' element={
                 <RequireAuth>
                   <Configuracion />
+                </RequireAuth>
+              } />
+               <Route path='/chats' element={
+                <RequireAuth>
+                  <Chats />
+                </RequireAuth>
+              } />
+              <Route path='/canales' element={
+                <RequireAuth>
+                  <Canales />
                 </RequireAuth>
               } />
             </Routes>
