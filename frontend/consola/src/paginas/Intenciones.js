@@ -130,6 +130,10 @@ const Intenciones = (props) => {
     administradorConexion.enviarMensaje({tipo: 'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, disparadores: disparadoresActualizados} }});
   };
 
+  const modificarConfiguracion = (configuracionIntencion) => {
+    administradorConexion.enviarMensaje({tipo:'actualizarIntencion', mensaje: { token, intencion: {...intencionEdicion, puedeDispararOtraIntencion: configuracionIntencion }}});
+  };
+
   //eliminaciones
   
   const eliminarDominio = (dominio) => {
@@ -450,6 +454,7 @@ const Intenciones = (props) => {
                                 cambiarEstadoModal({
                                   propiedades: propiedad,
                                   tipo: 'propiedadUnica',
+                                  aceptar: modificarConfiguracion
                                 })
                               }
                             >

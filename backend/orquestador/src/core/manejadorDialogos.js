@@ -72,7 +72,14 @@ class ManejadorDialogos {
         const intencionesSimilares = await this.#servicioPLN.buscarSimilitud(
           data
         );
-        if (intencionesSimilares?.similarities[0]?.similarity > 0.5) {
+        
+        if (intencionesSimilares?.similarities[0]?.intencion !== 'NO_ENTIENDE'){
+          const intencion = await this.#manejadorDatosInternos.buscarIntencion(
+            idNegocio,
+            'NO_ENTIENDE'
+          );
+          mejorIntencion = intencion.shift();
+        } else if(intencionesSimilares?.similarities[0]?.similarity > 0.5) {
           mejorIntencion =
             intencionesSimilares?.similarities?.shift().intention;
         } else {
@@ -112,9 +119,11 @@ class ManejadorDialogos {
                 topico: 'orquestadorManejadorDialogos',
                 mensaje: this.#mensaje,
               });
+            proximaRegla = 'intencionCumplida';  
             }
-            proximaRegla == 'intencionCumplida';
+            
           }
+
 
           if (proximaRegla !== '') {
             if (proximaRegla == 'intencionCumplida') {
@@ -230,6 +239,8 @@ class ManejadorDialogos {
             idCliente
           );
           indiceReglaAEjecutar += 1;
+        }else{
+          indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
         }
       }
     } else if (agenteAsignado !== '') {

@@ -21,6 +21,7 @@ const Canales = () => {
       >
         {canales.map((canal) => (
           <Card
+            elevation={2}
             key={canal.nombre}
             sx={{
               minWidth: 275,
@@ -41,7 +42,7 @@ const Canales = () => {
               </Typography>
             </CardContent>
             <CardActions sx={{ justifyContent: 'center' }}>
-              <Button disabled={canal.conectado} size="small">
+              <Button color='primary' variant='outlined' disabled={canal.conectado} size="small">
                 Conectar
               </Button>
             </CardActions>

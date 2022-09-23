@@ -137,7 +137,7 @@ const ModalPropiedades = (props) => {
                                       disablePortal
                                       id="intenciones-combo"
                                       options={intencionesEstado}
-                                      getOptionLabel={option => option.label ? option.label : intencionesEstado.find(i=>i.value === option).label}
+                                      getOptionLabel={option => option.label ? option.label : intencionesEstado.find(i=>i.value === option)?.label || ''}
                                       isOptionEqualToValue={(option, value) => option.value === value}
                                       value={configuracionRegla[key][indice].idIntencion || null}
                                       onChange={(e,valor) =>
@@ -244,6 +244,7 @@ const ModalPropiedades = (props) => {
           </>
         ),
       };
+      
   };
 
   const obtenerControlFormulario = (key, value) => {
@@ -449,6 +450,27 @@ const ModalPropiedades = (props) => {
             {`¿Está seguro que desea eliminar el disparador ${propiedades.id} ?`}
           </Typography>
         );
+      } if (tipo === 'propiedadUnica'){
+        return <>
+        <FormControl
+            fullWidth
+            sx={{ m: 1, minWidth: 230, margin: '8px 0px 8px 0px' }}
+          >
+            <InputLabel id="select-necesitaRespuesta-label">
+              {propiedades.llave}
+            </InputLabel>
+            <Select
+              labelId="select-necesitaRespuesta-label"
+              id="select-necesitaRespuesta"
+              value={configuracionIntencion.valor || false}
+              label="Necesita respuesta"
+              onChange={(e) => setConfiguracionIntencion({llave:propiedades.llave, valor: e.target.value})}
+            >
+              <MenuItem value={true}>SI</MenuItem>
+              <MenuItem value={false}>NO</MenuItem>
+            </Select>
+          </FormControl>
+        </>
     } else {
       return (
         <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -460,6 +482,7 @@ const ModalPropiedades = (props) => {
 
   const [reglaSeleccionada, setReglaSeleccionada] = useState({ id: '' });
   const [configuracionRegla, setConfiguracionRegla] = useState({});
+  const [configuracionIntencion, setConfiguracionIntencion] = useState({});
   const [dominio, setDominio] = useState('');
   const [disparador, setDisparador] = useState('');
   const [intencionesEstado, setIintencionesEstado] = useState([]);
@@ -492,6 +515,11 @@ const ModalPropiedades = (props) => {
       setConfiguracionRegla({ ...regla.configuracion });
     }
   }, [regla])
+
+  useEffect(() => {
+    if(tipo === 'propiedadUnica') setConfiguracionIntencion({...propiedades});
+  }, [tipo])
+  
 
   const aceptarModal = (tipo) => {
 
@@ -538,6 +566,9 @@ const ModalPropiedades = (props) => {
       aceptar({disparadorAnterior: propiedades.id, disparador})
     }
 
+    if (tipo === 'propiedadUnica'){
+      aceptar(configuracionIntencion.valor);
+    }
     //Eliminaciones
 
     if (tipo === 'eliminarDominio' || tipo === 'eliminarIntencion' || tipo === 'eliminarDisparador') aceptar(propiedades.id);

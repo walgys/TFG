@@ -30,7 +30,7 @@ class AdministradorConexion {
     });
   };
 
-  enviarMensaje = ({tipo, mensaje}) => {  
+  enviarMensaje = ({tipo, mensaje}) => { 
     this.socket.emit(tipo, JSON.stringify(mensaje));
   };
 
