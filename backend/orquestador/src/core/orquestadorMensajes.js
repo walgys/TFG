@@ -74,13 +74,14 @@ class OrquestadorMensajes {
         this.#colaMensajes.length > 0 &&
         this.#colaMD.length <= this.#cantidadInstanciasMD
       ) {
+        console.log('mensajes en cola',this.#colaMensajes.length)
         const uuid = uuidv4();
         const manejadorMD = new ManejadorDialogos({
           administradorDatosExternos: this.#manejadorDatosExternos,
           manejadorDatosInternos: this.#manejadorDatosInternos,
           servicioPLN: this.#servicioPLN,
           id: uuid,
-          mensaje: this.#colaMensajes.shift(),
+          mensajeEntrante: this.#colaMensajes.shift(),
           terminar: this.terminar,
           administradorReglas: this.#administradorReglas,
           servicioColasMensajes: this.#servicioColasMensajes,

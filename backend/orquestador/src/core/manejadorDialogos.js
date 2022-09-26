@@ -17,7 +17,7 @@ class ManejadorDialogos {
     administradorReglas,
     servicioPLN,
     uuid,
-    mensaje,
+    mensajeEntrante,
     terminar,
     servicioColasMensajes,
   }) {
@@ -26,7 +26,7 @@ class ManejadorDialogos {
     this.#manejadorDatosInternos = manejadorDatosInternos;
     this.#servicioPLN = servicioPLN;
     this.#uuid = uuid;
-    this.#mensaje = mensaje;
+    this.#mensaje = mensajeEntrante;
     this.#terminar = terminar;
     this.#administradorReglas = administradorReglas;
     this.#servicioColasMensajes = servicioColasMensajes;
@@ -56,7 +56,7 @@ class ManejadorDialogos {
             intencionEnEjecucion
           );
       }
-      if (
+        if (
         intencionEnEjecucion == '' ||
         (!!mejorIntencion &&
           mejorIntencion.puedeDispararOtraIntencion &&
@@ -100,27 +100,69 @@ class ManejadorDialogos {
       while (mejorIntencion?.reglas?.length > indiceReglaAEjecutar) {
         if (intencionEnEjecucion != '') {
           if (ultimaRegla.tipo == 'MENU') {
-            if (!!opcion && opcion.accion == 'IR_INTENCION') {
-              datosClienteActualizado = {
-                ...datosCliente,
-                estadoCliente: {
-                  ...datosCliente.estadoCliente,
-                  intencionEnEjecucion: opcion.idIntencion,
-                  topico: '',
-                  ultimaRegla: '',
-                  proximaRegla: '',
-                },
-              };
-              this.#manejadorDatosInternos.actualizarDatosCliente(
-                datosClienteActualizado,
-                idCliente
-              );
-              this.#servicioColasMensajes.agregarMensaje({
-                topico: 'orquestadorManejadorDialogos',
-                mensaje: this.#mensaje,
-              });
-            proximaRegla = 'intencionCumplida';  
-            }
+            if(!!opcion){
+              if ( opcion.accion == 'IR_INTENCION') {
+                datosClienteActualizado = {
+                  ...datosCliente,
+                  estadoCliente: {
+                    ...datosCliente.estadoCliente,
+                    intencionEnEjecucion: opcion.idIntencion,
+                    topico: '',
+                    ultimaRegla: '',
+                    proximaRegla: '',
+                  },
+                };
+                await this.#manejadorDatosInternos.actualizarDatosCliente(
+                  datosClienteActualizado,
+                  idCliente
+                  );
+                  await this.#servicioColasMensajes.agregarMensaje({
+                    topico: 'orquestadorManejadorDialogos',
+                    mensaje: this.#mensaje,
+                  });
+                  proximaRegla = 'intencionCumplida';  
+                }
+              }else{
+                const opcionConversacional = ultimaRegla.configuracion.opciones.find(opcion => opcion.texto.toLowerCase() == texto.toLowerCase());
+                let nuevoMensaje = {...this.#mensaje};
+                if(opcionConversacional){
+                  if ( opcionConversacional.accion == 'IR_INTENCION') {
+                    datosClienteActualizado = {
+                      ...datosCliente,
+                      estadoCliente: {
+                        ...datosCliente.estadoCliente,
+                        intencionEnEjecucion: opcionConversacional.idIntencion,
+                        topico: '',
+                        ultimaRegla: '',
+                        proximaRegla: '',
+                      },
+                    };
+                    const mensajeDatos = JSON.parse(this.#mensaje.datos.mensaje);
+                    nuevoMensaje = {...this.#mensaje, datos:{...this.#mensaje.datos, mensaje: JSON.stringify({...mensajeDatos, cuerpo: {...mensajeDatos.cuerpo, opcion:opcionConversacional}})}};
+
+                  } else{
+                    datosClienteActualizado = {
+                      ...datosCliente,
+                      estadoCliente: {
+                        ...datosCliente.estadoCliente,
+                        intencionEnEjecucion: '2tA5BxJZeYUE3iIa2myZ',
+                        topico: '',
+                        ultimaRegla: '',
+                        proximaRegla: '',
+                      },
+                    };
+                  }
+                    await this.#manejadorDatosInternos.actualizarDatosCliente(
+                      datosClienteActualizado,
+                      idCliente
+                      );
+                      await this.#servicioColasMensajes.agregarMensaje({
+                        topico: 'orquestadorManejadorDialogos',
+                        mensaje: nuevoMensaje,
+                      });
+                      proximaRegla = 'intencionCumplida'; 
+                    }
+              }
             
           }
 
@@ -135,9 +177,8 @@ class ManejadorDialogos {
                   indiceReglaAEjecutar = indice;
                 }
               });
-
-              if (!reglaAEjecutar) {
-                intencionCumplida = true;
+              if(!reglaAEjecutar){
+                reglaAEjecutar = mejorIntencion.reglas[0];
               }
             }
           } else {
@@ -148,7 +189,7 @@ class ManejadorDialogos {
         }
 
         if (!intencionCumplida) {
-          const reglaEncontrada = this.#administradorReglas.buscarRegla(
+          const reglaEncontrada = await this.#administradorReglas.buscarRegla(
             reglaAEjecutar.tipo
           );
 
@@ -163,7 +204,7 @@ class ManejadorDialogos {
             };
 
             const resultado =
-              reglaEncontrada.ejecutarRegla(objetoConfiguracion);
+              await reglaEncontrada.ejecutarRegla(objetoConfiguracion);
 
             if (resultado.cambioIntencion) {
               datosClienteActualizado = {
@@ -175,11 +216,11 @@ class ManejadorDialogos {
                   proximaRegla: '',
                 },
               };
-              this.#manejadorDatosInternos.actualizarDatosCliente(
+              await this.#manejadorDatosInternos.actualizarDatosCliente(
                 datosClienteActualizado,
                 idCliente
               );
-              this.#servicioColasMensajes.agregarMensaje({
+              await this.#servicioColasMensajes.agregarMensaje({
                 topico: 'orquestadorManejadorDialogos',
                 mensaje: this.#mensaje,
               });
@@ -217,29 +258,14 @@ class ManejadorDialogos {
               }
             }
 
-            this.#manejadorDatosInternos.actualizarDatosCliente(
+            await this.#manejadorDatosInternos.actualizarDatosCliente(
               datosClienteActualizado,
               idCliente
             );
             indiceReglaAEjecutar += 1;
             if (reglaAEjecutar.configuracion?.necesitaRespuesta) return;
           }
-        } else if (!opcion) {
-          datosClienteActualizado = {
-            ...datosCliente,
-            estadoCliente: {
-              ...datosCliente.estadoCliente,
-              intencionEnEjecucion: '',
-              ultimaRegla: '',
-              proximaRegla: '',
-            },
-          };
-          this.#manejadorDatosInternos.actualizarDatosCliente(
-            datosClienteActualizado,
-            idCliente
-          );
-          indiceReglaAEjecutar += 1;
-        }else{
+        } else {
           indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
         }
       }
