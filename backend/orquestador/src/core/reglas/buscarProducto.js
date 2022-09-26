@@ -1,6 +1,6 @@
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
-class PREGUNTAR {
+class BUSCAR_PRODUCTO {
   ejecutarRegla = ({
     servicioColasMensajes,
     configuracionRegla,
@@ -34,4 +34,4 @@ class PREGUNTAR {
   };
 }
 
-module.exports = { PREGUNTAR };
+module.exports = { BUSCAR_PRODUCTO };

@@ -44,7 +44,7 @@ class ManejadorDialogos {
 
     const { topico, botActivado, agenteAsignado } = datosCliente.estadoCliente;
 
-    let { intencionEnEjecucion, ultimaRegla, proximaRegla } =
+    let { intencionEnEjecucion, ultimaRegla, esperaRespuesta } =
       datosCliente.estadoCliente;
 
     let mejorIntencion;
@@ -56,7 +56,7 @@ class ManejadorDialogos {
             intencionEnEjecucion
           );
       }
-        if (
+      if (
         intencionEnEjecucion == '' ||
         (!!mejorIntencion &&
           mejorIntencion.puedeDispararOtraIntencion &&
@@ -72,14 +72,16 @@ class ManejadorDialogos {
         const intencionesSimilares = await this.#servicioPLN.buscarSimilitud(
           data
         );
-        
-        if (intencionesSimilares?.similarities[0]?.intencion !== 'NO_ENTIENDE'){
+
+        if (
+          intencionesSimilares?.similarities[0]?.intencion !== 'NO_ENTIENDE'
+        ) {
           const intencion = await this.#manejadorDatosInternos.buscarIntencion(
             idNegocio,
             'NO_ENTIENDE'
           );
           mejorIntencion = intencion.shift();
-        } else if(intencionesSimilares?.similarities[0]?.similarity > 0.5) {
+        } else if (intencionesSimilares?.similarities[0]?.similarity > 0.5) {
           mejorIntencion =
             intencionesSimilares?.similarities?.shift().intention;
         } else {
@@ -97,11 +99,97 @@ class ManejadorDialogos {
       let reglaAEjecutar;
       let indiceReglaAEjecutar = 0;
       let datosClienteActualizado;
+      const ejecucionSimpleDeRegla = async () => {
+        const reglaEncontrada = await this.#administradorReglas.buscarRegla(
+          reglaAEjecutar.tipo
+        );
+        if (reglaEncontrada) {
+          let objetoConfiguracion = {
+            administradorEntidades: this.#administradorEntidades,
+            manejadorDatosExternos: this.#manejadorDatosExternos,
+            manejadorDatosInternos: this.#manejadorDatosInternos,
+            servicioColasMensajes: this.#servicioColasMensajes,
+            mensajeEntrante: this.#mensaje,
+            configuracionRegla: reglaAEjecutar.configuracion,
+          };
+
+          const resultado = await reglaEncontrada.ejecutarRegla(
+            objetoConfiguracion
+          );
+
+          if (resultado.cambioIntencion) {
+            datosClienteActualizado = {
+              ...datosCliente,
+              estadoCliente: {
+                ...datosCliente.estadoCliente,
+                intencionEnEjecucion: resultado.nuevaIntencion,
+                ultimaRegla: '',
+                esperaRespuesta: false
+              },
+            };
+            await this.#manejadorDatosInternos.actualizarDatosCliente(
+              datosClienteActualizado,
+              idCliente
+            );
+            await this.#servicioColasMensajes.agregarMensaje({
+              topico: 'orquestadorManejadorDialogos',
+              mensaje: this.#mensaje,
+            });
+            indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
+            return;
+          } else {
+            //no es cambio de intención
+            const esperaRespuesta = reglaAEjecutar.tipo === 'MENU' || reglaAEjecutar.tipo === 'PREGUNTAR';
+            datosClienteActualizado = {
+              ...datosCliente,
+              estadoCliente: {
+                ...datosCliente.estadoCliente,
+                ultimaRegla: reglaAEjecutar,
+                esperaRespuesta
+              },
+            };
+            await this.#manejadorDatosInternos.actualizarDatosCliente(
+              datosClienteActualizado,
+              idCliente
+            );
+            ultimaRegla = reglaAEjecutar;
+            if(reglaAEjecutar.tipo === 'MENU' || reglaAEjecutar.tipo === 'PREGUNTAR') {
+              indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
+              return;
+           }
+          }
+        } else {
+          // no encontró tipo de regla
+        }
+      }
+      const tiposQueEsperanRespuesta = ['PREGUNTAR','MENU','BUSCAR_PRODUCTO']
+
       while (mejorIntencion?.reglas?.length > indiceReglaAEjecutar) {
-        if (intencionEnEjecucion != '') {
-          if (ultimaRegla.tipo == 'MENU') {
-            if(!!opcion){
-              if ( opcion.accion == 'IR_INTENCION') {
+        reglaAEjecutar = mejorIntencion.reglas[indiceReglaAEjecutar];
+          if (!!esperaRespuesta && tiposQueEsperanRespuesta.includes(reglaAEjecutar.tipo)){
+            if(reglaAEjecutar.tipo === 'BUSCAR_PRODUCTO'){
+              
+            }
+            if(reglaAEjecutar.tipo === 'PREGUNTAR'){
+              datosClienteActualizado = {
+                ...datosCliente,
+                estadoCliente: {
+                  ...datosCliente.estadoCliente,
+                  variablesCliente:[
+                    ...datosCliente.estadoCliente.variablesCliente,
+                    {nombre: reglaAEjecutar.configuracion.variableDestino, valor: texto}
+                  ]
+                },
+              };
+              await this.#manejadorDatosInternos.actualizarDatosCliente(
+                datosClienteActualizado,
+                idCliente
+              );
+            }
+            if(reglaAEjecutar.tipo === 'MENU')
+          {
+            if (!!opcion) {
+              if (opcion.accion == 'IR_INTENCION') {
                 datosClienteActualizado = {
                   ...datosCliente,
                   estadoCliente: {
@@ -109,165 +197,85 @@ class ManejadorDialogos {
                     intencionEnEjecucion: opcion.idIntencion,
                     topico: '',
                     ultimaRegla: '',
-                    proximaRegla: '',
+                    esperaRespuesta: false
                   },
                 };
                 await this.#manejadorDatosInternos.actualizarDatosCliente(
                   datosClienteActualizado,
                   idCliente
-                  );
-                  await this.#servicioColasMensajes.agregarMensaje({
-                    topico: 'orquestadorManejadorDialogos',
-                    mensaje: this.#mensaje,
-                  });
-                  proximaRegla = 'intencionCumplida';  
-                }
-              }else{
-                const opcionConversacional = ultimaRegla.configuracion.opciones.find(opcion => opcion.texto.toLowerCase() == texto.toLowerCase());
-                let nuevoMensaje = {...this.#mensaje};
-                if(opcionConversacional){
-                  if ( opcionConversacional.accion == 'IR_INTENCION') {
-                    datosClienteActualizado = {
-                      ...datosCliente,
-                      estadoCliente: {
-                        ...datosCliente.estadoCliente,
-                        intencionEnEjecucion: opcionConversacional.idIntencion,
-                        topico: '',
-                        ultimaRegla: '',
-                        proximaRegla: '',
-                      },
-                    };
-                    const mensajeDatos = JSON.parse(this.#mensaje.datos.mensaje);
-                    nuevoMensaje = {...this.#mensaje, datos:{...this.#mensaje.datos, mensaje: JSON.stringify({...mensajeDatos, cuerpo: {...mensajeDatos.cuerpo, opcion:opcionConversacional}})}};
-
-                  } else{
-                    datosClienteActualizado = {
-                      ...datosCliente,
-                      estadoCliente: {
-                        ...datosCliente.estadoCliente,
-                        intencionEnEjecucion: '2tA5BxJZeYUE3iIa2myZ',
-                        topico: '',
-                        ultimaRegla: '',
-                        proximaRegla: '',
-                      },
-                    };
-                  }
-                    await this.#manejadorDatosInternos.actualizarDatosCliente(
-                      datosClienteActualizado,
-                      idCliente
-                      );
-                      await this.#servicioColasMensajes.agregarMensaje({
-                        topico: 'orquestadorManejadorDialogos',
-                        mensaje: nuevoMensaje,
-                      });
-                      proximaRegla = 'intencionCumplida'; 
-                    }
+                );
+                await this.#servicioColasMensajes.agregarMensaje({
+                  topico: 'orquestadorManejadorDialogos',
+                  mensaje: this.#mensaje,
+                });
+                indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
+                return;
               }
-            
-          }
-
-
-          if (proximaRegla !== '') {
-            if (proximaRegla == 'intencionCumplida') {
-              intencionCumplida = true;
             } else {
-              mejorIntencion.reglas.forEach((regla, indice) => {
-                if (regla.id === proximaRegla.id) {
-                  reglaAEjecutar = regla;
-                  indiceReglaAEjecutar = indice;
+              let nuevoMensaje = { ...this.#mensaje };
+              const opcionEncontrada =
+              reglaAEjecutar.configuracion.opciones.find(
+                  (opcionRegla) =>
+                    opcionRegla.texto.toLowerCase() === texto.toLowerCase()
+                );
+              if (!!opcionEncontrada) {
+                //acciones de intencion encontrada
+                if (opcionEncontrada.accion == 'IR_INTENCION') {
+                  datosClienteActualizado = {
+                    ...datosCliente,
+                    estadoCliente: {
+                      ...datosCliente.estadoCliente,
+                      intencionEnEjecucion: opcionEncontrada.idIntencion,
+                      topico: '',
+                      ultimaRegla: '',
+                      esperaRespuesta: false
+                    },
+                  };
+                  const mensajeDatos = JSON.parse(this.#mensaje.datos.mensaje);
+                  nuevoMensaje = {
+                    ...this.#mensaje,
+                    datos: {
+                      ...this.#mensaje.datos,
+                      mensaje: JSON.stringify({
+                        ...mensajeDatos,
+                        cuerpo: {
+                          ...mensajeDatos.cuerpo,
+                          opcion: opcionEncontrada,
+                        },
+                      }),
+                    },
+                  };
                 }
-              });
-              if(!reglaAEjecutar){
-                reglaAEjecutar = mejorIntencion.reglas[0];
-              }
-            }
-          } else {
-            reglaAEjecutar = mejorIntencion.reglas[0];
-          }
-        } else if (ultimaRegla === '' && proximaRegla === '') {
-          reglaAEjecutar = mejorIntencion.reglas[0];
-        }
-
-        if (!intencionCumplida) {
-          const reglaEncontrada = await this.#administradorReglas.buscarRegla(
-            reglaAEjecutar.tipo
-          );
-
-          if (reglaEncontrada) {
-            let objetoConfiguracion = {
-              administradorEntidades: this.#administradorEntidades,
-              manejadorDatosExternos: this.#manejadorDatosExternos,
-              manejadorDatosInternos: this.#manejadorDatosInternos,
-              servicioColasMensajes: this.#servicioColasMensajes,
-              mensajeEntrante: this.#mensaje,
-              configuracionRegla: reglaAEjecutar.configuracion,
-            };
-
-            const resultado =
-              await reglaEncontrada.ejecutarRegla(objetoConfiguracion);
-
-            if (resultado.cambioIntencion) {
-              datosClienteActualizado = {
-                ...datosCliente,
-                estadoCliente: {
-                  ...datosCliente.estadoCliente,
-                  intencionEnEjecucion: resultado.nuevaIntencion,
-                  ultimaRegla: '',
-                  proximaRegla: '',
-                },
-              };
-              await this.#manejadorDatosInternos.actualizarDatosCliente(
-                datosClienteActualizado,
-                idCliente
-              );
-              await this.#servicioColasMensajes.agregarMensaje({
-                topico: 'orquestadorManejadorDialogos',
-                mensaje: this.#mensaje,
-              });
-            } else {
-              if (mejorIntencion.reglas.length - 1 === indiceReglaAEjecutar) {
-                datosClienteActualizado = {
-                  ...datosCliente,
-                  estadoCliente: {
-                    ...datosCliente.estadoCliente,
-                    topico: mejorIntencion.topico,
-                    intencionEnEjecucion: '',
-                    ultimaRegla: '',
-                    proximaRegla: '',
-                  },
-                };
               } else {
-                intencionEnEjecucion = mejorIntencion.id;
-                ultimaRegla = reglaAEjecutar;
-                proximaRegla =
-                  mejorIntencion.reglas.length - 1 === indiceReglaAEjecutar
-                    ? ''
-                    : mejorIntencion.reglas[indiceReglaAEjecutar + 1];
-
-                datosClienteActualizado = {
-                  ...datosCliente,
-                  estadoCliente: {
-                    ...datosCliente.estadoCliente,
-                    intencionEnEjecucion: intencionEnEjecucion,
-                    topico: mejorIntencion.topico,
-                    estadoIntencion: '',
-                    ultimaRegla: ultimaRegla,
-                    proximaRegla: proximaRegla,
-                  },
-                };
+                  //default a repregunta
+                  datosClienteActualizado = {
+                    ...datosCliente,
+                    estadoCliente: {
+                      ...datosCliente.estadoCliente,
+                      intencionEnEjecucion: intencionEnEjecucion,
+                      ultimaRegla: '',
+                      esperaRespuesta: false
+                    },
+                  };
+                }
+                await this.#manejadorDatosInternos.actualizarDatosCliente(
+                  datosClienteActualizado,
+                  idCliente
+                );
+                await this.#servicioColasMensajes.agregarMensaje({
+                  topico: 'orquestadorManejadorDialogos',
+                  mensaje: nuevoMensaje,
+                });
+                indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
+                return;
               }
-            }
-
-            await this.#manejadorDatosInternos.actualizarDatosCliente(
-              datosClienteActualizado,
-              idCliente
-            );
-            indiceReglaAEjecutar += 1;
-            if (reglaAEjecutar.configuracion?.necesitaRespuesta) return;
           }
-        } else {
-          indiceReglaAEjecutar = mejorIntencion?.reglas?.length;
-        }
+
+        }else{
+            await ejecucionSimpleDeRegla();
+          }
+
+        indiceReglaAEjecutar += 1;
       }
     } else if (agenteAsignado !== '') {
       //reenviar a agente los mensajes.

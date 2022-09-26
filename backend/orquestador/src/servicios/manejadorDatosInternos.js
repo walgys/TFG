@@ -284,13 +284,10 @@ class ManejadorDatosInternos {
         estadoUltimaRegla: '',
         intencionEnEjecucion: '',
         ultimaRegla: '',
-        proximaRegla: '',
+        esperandoRespuesta: false,
         botActivado: true,
         topico: '',
-        variablesCliente: {
-          nombre: '',
-          valor: '',
-        },
+        variablesCliente: [],
       },
       fecha: moment(),
     };
