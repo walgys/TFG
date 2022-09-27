@@ -73,15 +73,7 @@ class ManejadorDialogos {
           data
         );
 
-        if (
-          intencionesSimilares?.similarities[0]?.intencion !== 'NO_ENTIENDE'
-        ) {
-          const intencion = await this.#manejadorDatosInternos.buscarIntencion(
-            idNegocio,
-            'NO_ENTIENDE'
-          );
-          mejorIntencion = intencion.shift();
-        } else if (intencionesSimilares?.similarities[0]?.similarity > 0.5) {
+        if (intencionesSimilares?.similarities[0]?.similarity > 0.5) {
           mejorIntencion =
             intencionesSimilares?.similarities?.shift().intention;
         } else {
@@ -168,7 +160,7 @@ class ManejadorDialogos {
         reglaAEjecutar = mejorIntencion.reglas[indiceReglaAEjecutar];
           if (!!esperaRespuesta && tiposQueEsperanRespuesta.includes(reglaAEjecutar.tipo)){
             if(reglaAEjecutar.tipo === 'BUSCAR_PRODUCTO'){
-              
+
             }
             if(reglaAEjecutar.tipo === 'PREGUNTAR'){
               datosClienteActualizado = {

@@ -24,7 +24,7 @@ class ServicioPLN {
     try {
       const newConfig = {
         ...this.#configuracion,
-        url: this.#configuracion.url + 'buscarSimilitud',
+        url: this.#configuracion.url + 'buscarSimilitudIntenciones',
         data: JSON.stringify(data),
       };
       const res = await axios(newConfig);
