@@ -292,7 +292,7 @@ const ModalPropiedades = (props) => {
           </FormControl>
         ),
       };
-    if (Array.isArray(value)) return obtenerArreglo(key);
+    if (Array.isArray(value)) return  obtenerArreglo(key);
     
   };
 

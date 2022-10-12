@@ -48,6 +48,11 @@ const PieChat = (props) => {
     administradorConexion.enviarMensaje(mensaje);
     setTextoEnviar('');
   };
+
+  const handleKeyDown = (e) =>{
+    if(e.key === 'Enter') enviarMensaje();
+  }
+
   return (
     <div className="piechat-contenedor">
       <IconButton aria-label="smileys">
@@ -59,6 +64,7 @@ const PieChat = (props) => {
         inputProps={{ 'aria-label': 'escriba aqui' }}
         onChange={(e) => setTextoEnviar(e.target.value)}
         value={textoEnviar}
+        onKeyDown={e=>handleKeyDown(e)}
       />
       <IconButton>
         <AlternateEmailIcon />

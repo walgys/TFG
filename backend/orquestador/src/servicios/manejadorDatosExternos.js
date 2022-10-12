@@ -1,4 +1,4 @@
-const { axios } = require('axios');
+const axios = require('axios');
 
 class ManejadorDatosExternos {
   static #instancia;
@@ -13,7 +13,16 @@ class ManejadorDatosExternos {
     return this.#instancia;
   }
 
-  buscarListaProductos = () => {};
+  buscarProductos = async () => {
+      const callResult = await axios({
+      method: 'GET',
+      url: 'http://localhost:10000/api/v1/productos',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch(ex=>console.log(ex));
+    return callResult.data;
+  };
 
   buscarClienteExterno = () => {};
 

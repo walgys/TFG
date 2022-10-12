@@ -9,6 +9,7 @@ const { QUITAR_DEL_CARRITO } = require('./quitarDelCarrito');
 const { RESPUESTA_MENU } = require('./respuestaMenu');
 const { RESPUESTA_PREGUNTA } = require('./respuestaPregunta');
 const { TERMINAR_COMPRA } = require('./terminarCompra');
+const { BUSCAR_PRODUCTO } = require('./buscarProducto')
 class AdministradorReglas {
   static #instancia;
   #reglas = [];
@@ -25,6 +26,7 @@ class AdministradorReglas {
       GUARDAR_VARIABLE: () => new GUARDAR_VARIABLE(),
       PREGUNTAR: () => new PREGUNTAR(),
       RESPUESTA_PREGUNTA: () => new RESPUESTA_PREGUNTA(),
+      BUSCAR_PRODUCTO: () => new BUSCAR_PRODUCTO(),
     };
   }
 

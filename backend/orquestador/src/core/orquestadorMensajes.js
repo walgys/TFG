@@ -79,6 +79,7 @@ class OrquestadorMensajes {
         const manejadorMD = new ManejadorDialogos({
           administradorDatosExternos: this.#manejadorDatosExternos,
           manejadorDatosInternos: this.#manejadorDatosInternos,
+          manejadorDatosExternos: this.#manejadorDatosExternos,
           servicioPLN: this.#servicioPLN,
           id: uuid,
           mensajeEntrante: this.#colaMensajes.shift(),

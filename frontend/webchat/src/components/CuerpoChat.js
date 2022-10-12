@@ -5,6 +5,7 @@ import './cuerpoChat.scss';
 import MensajeEnviado from './MensajeEnviado';
 import MensajeRecibido from './MensajeRecibido';
 import Menu from './Menu';
+import ProductCard from './ProductCard';
 
 const CuerpoChat = (props) => {
   const { estado, setEstado, administradorConexion } = props;
@@ -65,6 +66,23 @@ const CuerpoChat = (props) => {
                         }
                       />
                     );
+                  } else if (mensaje.cuerpo?.tipo === 'CARD') {
+                    return mensaje.cuerpo.cards.map((card, index) => <ProductCard
+                    key={mensaje.id+index}
+                    nombreAvatar={nombreAvatar}
+                    nombre={card.nombre}
+                    descripcion={card.descripcion}
+                    precio={card.precio}
+                    foto={card.foto}
+                    opciones={card.opciones}
+                    administradorConexion={administradorConexion}
+                    hora={moment
+                      .unix(mensaje.fecha._seconds)
+                      .format('hh:mm A')}
+                    ultimo={
+                      mensajesBot[mensajesBot.length - 1].id === mensaje.id
+                    }
+                    />);
                   } else {
                     return (
                       <MensajeRecibido

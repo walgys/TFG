@@ -35,6 +35,18 @@ class BuscarSimilitudPalabrasHilo(Resource):
         except Exception as ex:
             return jsonify(error=str(ex))
 
+class BuscarSimilitudProductosHilo(Resource):
+    def post(self):
+        try:
+            productos = request.json["productos"]
+            clienteDice = core.iniciarPLN(request.json["clienteDice"])
+            return jsonify(
+                customerSays=request.json["clienteDice"],
+                similarities=buscarSimilitudProductos(clienteDice, productos),
+            )
+        except Exception as ex:
+            return jsonify(error=str(ex))
+
 
 def buscarSimilitud(dominios, clienteDice, contexto):
     resultados = []
@@ -112,8 +124,19 @@ def buscarSimilitudPalabras(clienteDice, palabras):
     for palabra in palabras:
         palabra_nlp = core.iniciarPLN(palabra)
         resultados.append({"word": palabra, "similarity": clienteDice.similarity(palabra_nlp)})
+    resultados.sort(key=lambda x: x["similarity"], reverse=True)
+    return resultados[:5]
+
+def buscarSimilitudProductos(clienteDice, productos):
+    resultados = []
+    for producto in productos:
+        producto_nlp = core.iniciarPLN(producto["nombre"])
+        resultados.append({"producto": producto, "similarity": clienteDice.similarity(producto_nlp)})
+    resultados.sort(key=lambda x: x["similarity"], reverse=True)
+    print(resultados[:5])
     return resultados[:5]
 
 
 api.add_resource(BuscarSimilitudHilo, "/buscarSimilitudIntenciones")
 api.add_resource(BuscarSimilitudPalabrasHilo, "/buscarSimilitudPalabras")
+api.add_resource(BuscarSimilitudProductosHilo, "/buscarSimilitudProductos")

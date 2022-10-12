@@ -91,8 +91,13 @@ class ManejadorWebchat {
       const mensajeSaliente = this.#colaMensajesSalientes.shift();
       const { endpoint, datos } = mensajeSaliente;
       const { idSocket, mensaje } = datos;
-      this.#websocket.fetchSockets(idSocket).then((socket) => {
-        socket.find((socket) => socket.id === idSocket).emit(endpoint, mensaje);
+        this.#websocket.fetchSockets(idSocket).then((socket) => {
+        const foundSocket = socket.find((socket) => socket.id === idSocket);
+        if(foundSocket){
+          foundSocket.emit(endpoint, mensaje);
+        }else{
+          return
+        }
       });
     }
   };

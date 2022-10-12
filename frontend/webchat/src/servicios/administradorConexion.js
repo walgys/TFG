@@ -55,7 +55,7 @@ class AdministradorConexion {
 
     this.#socket.on('mensajeBotEntrante-webchat', (datos) => {
       const objetoDatos = JSON.parse(datos);
-
+      if(datos.includes("cards")) console.log(datos);
       this.#setEstado((prevState) => {
         const sesiones = prevState.sesiones.map((sesion, indice) => {
           if (indice == prevState.sesiones.length - 1) {
